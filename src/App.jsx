@@ -4,6 +4,7 @@ import Home from './screens/Home';
 import StockEntry from './screens/StockEntry';
 import Header from './components/Header/Header';
 import { HeaderMain } from './components/Header/HeaderMain'; // ← nome atualizado
+import Dashboard from './screens/Dashboard';
 
 function LayoutHandler() {
   const location = useLocation();
@@ -16,6 +17,7 @@ function LayoutHandler() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/estoque" element={<StockEntry />} />
+        <Route path="/dashboard" element={<Dashboard />} /> 
       </Routes>
     </>
   );

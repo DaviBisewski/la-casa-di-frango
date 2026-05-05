@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
-import { InputGroup } from '../components/Forms/InputGroup';
+import { InputGroup } from "../components/Forms/InputGroup";
+import { ButtonConfirm } from "../components/ui/ButtonConfirm";
+import stockIcon from '../assets/icons/frango.svg';
 
-export default function StockEntry({ onFinish }) {
+export default function StockEntry() {
   const { iniciarExpedienteComEstoque } = useExpediente();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     comRecheio: "",
@@ -17,91 +21,87 @@ export default function StockEntry({ onFinish }) {
   const isSunday = new Date().getDay() === 0;
 
   function handleChange(e) {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   }
 
   function handleSubmit() {
     iniciarExpedienteComEstoque(form);
-    onFinish();
+    navigate("/dashboard");
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white font-sans">
+      <div className="max-w-[1400px] mx-auto px-12 py-16">
 
-      <div className="p-6 max-w-md mx-auto">
-        <div className="flex items-center gap-2 mb-2">
-          {/* Ícone de gráfico/estoque simulado */}
-          <span className="text-2xl">📊</span> 
-          <h2 className="text-[#1e392a] text-xl font-bold">
+        <div className="flex items-center gap-6 mb-4">
+          <img src={stockIcon} alt="Estoque" className="w-14 h-14" />
+          <h2 className="text-[#0F4C3A] text-5xl font-bold tracking-tight">
             Informe o estoque de hoje
           </h2>
         </div>
-        
-        <p className="text-gray-500 mb-8 italic">
-          Hoje é {new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())}
+
+        <p className="text-[#0F4C3A]/60 text-3xl font-medium mb-16 capitalize">
+          Hoje é {new Intl.DateTimeFormat('pt-BR', {
+            weekday: 'long', day: 'numeric', month: 'long'
+          }).format(new Date())}
         </p>
 
-        {/* CAMPOS PADRÃO (SEMANA) */}
-        <InputGroup 
-          label="Informe quantidade de Frangos C/R:" 
-          name="comRecheio" 
-          placeholder="Ex: 40" 
-          value={form.comRecheio}
-          onChange={handleChange} 
-        />
+        <div className="space-y-6">
+          <InputGroup
+            label="Informe quantidade de Frangos C/R:"
+            name="comRecheio"
+            placeholder="Ex: 40"
+            value={form.comRecheio}
+            onChange={handleChange}
+          />
+          <InputGroup
+            label="Informe quantidade de Frangos S/R:"
+            name="semRecheio"
+            placeholder="Ex: 40"
+            value={form.semRecheio}
+            onChange={handleChange}
+          />
+          <InputGroup
+            label="Informe quantidade de Meios Frangos:"
+            name="meio"
+            placeholder="Ex: 10"
+            value={form.meio}
+            onChange={handleChange}
+          />
 
-        <InputGroup 
-          label="Informe quantidade de Frangos S/R:" 
-          name="semRecheio" 
-          placeholder="Ex: 40" 
-          value={form.semRecheio}
-          onChange={handleChange} 
-        />
+          {isSunday && (
+            <div className="pt-12 space-y-6 border-t-2 border-gray-100 mt-6">
+              <InputGroup
+                label="Quantidade de Maionese (P):"
+                name="maionese10"
+                placeholder="Ex: 15"
+                value={form.maionese10}
+                onChange={handleChange}
+              />
+              <InputGroup
+                label="Quantidade de Maionese (G):"
+                name="maionese15"
+                placeholder="Ex: 10"
+                value={form.maionese15}
+                onChange={handleChange}
+              />
+              <InputGroup
+                label="Quantidade de Costela:"
+                name="costela"
+                placeholder="Ex: 5"
+                value={form.costela}
+                onChange={handleChange}
+              />
+            </div>
+          )}
+        </div>
 
-        <InputGroup 
-          label="Informe quantidade de Meios Frangos:" 
-          name="meio" 
-          placeholder="Ex: 10" 
-          value={form.meio}
-          onChange={handleChange} 
-        />
+        <div className="mt-14">
+          <ButtonConfirm onClick={handleSubmit}>
+            Confirmar
+          </ButtonConfirm>
+        </div>
 
-        {/* CAMPOS EXCLUSIVOS DE DOMINGO */}
-        {isSunday && (
-          <div className="pt-4 border-t border-gray-100 mt-4">
-            <InputGroup 
-              label="Quantidade de Maionese (P):" 
-              name="maionese10" 
-              placeholder="Ex: 15" 
-              value={form.maionese10}
-              onChange={handleChange} 
-            />
-            <InputGroup 
-              label="Quantidade de Maionese (G):" 
-              name="maionese15" 
-              placeholder="Ex: 10" 
-              value={form.maionese15}
-              onChange={handleChange} 
-            />
-            <InputGroup 
-              label="Quantidade de Costela:" 
-              name="costela" 
-              placeholder="Ex: 5" 
-              value={form.costela}
-              onChange={handleChange} 
-            />
-          </div>
-        )}
-
-        <button 
-          onClick={handleSubmit}
-          className="w-full bg-[#2a4435] text-white font-bold py-4 rounded-lg mt-4 hover:bg-[#1e392a] transition-colors shadow-lg"
-        >
-          Confirmar
-        </button>
       </div>
     </div>
   );
