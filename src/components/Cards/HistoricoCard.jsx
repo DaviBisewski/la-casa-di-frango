@@ -1,4 +1,4 @@
-import ativoIcon from '../../assets/icons/statusActive.svg';
+import ativoIcon from '../../assets/icons/clock.svg';
 import encerradoIcon from '../../assets/icons/encerrado.svg';
 
 const DIAS_SEMANA = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
