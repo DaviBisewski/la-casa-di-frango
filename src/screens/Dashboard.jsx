@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
-import { EstoqueCarrossel } from "../components/Layout/EstoqueCarrocel";
+import { EstoqueCarrossel } from "../components/Layout/EstoqueCarrosel";
 import { EstoqueCard } from "../components/Cards/EstoqueCard";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 
 import estoqueIcon from "../assets/icons/estoque.svg";
-import ativoIcon from "../assets/icons/clock.svg";
+import ativoIcon from "../assets/icons/statusActive.svg";
 import encerradoIcon from "../assets/icons/encerrado.svg";
 import frangoIcon from "../assets/icons/frango.svg";
 import maioneseIcon from "../assets/icons/maionese.svg";
 import costelaIcon from "../assets/icons/costela.svg";
+import encomendaIcon from "../assets/icons/frango.svg";
+import vendaIcon from "../assets/icons/venda.svg";
 
 const FILTROS = [
   { key: "frangos",   label: "Frangos",   icone: frangoIcon   },
@@ -32,9 +34,9 @@ export default function Dashboard() {
   const isAtivo = status === "active";
 
   const itemsFrangos = [
-    { titulo: "Frangos C/R", icone: frangoIcon,  estoque: estoque.frangosComRecheio },
-    { titulo: "Frangos S/R", icone: frangoIcon,  estoque: estoque.frangosSemRecheio },
-    { titulo: "Meio Frango", icone: frangoIcon,  estoque: estoque.meioFrango        },
+    { titulo: "Frangos C/R", icone: frangoIcon, estoque: estoque.frangosComRecheio },
+    { titulo: "Frangos S/R", icone: frangoIcon, estoque: estoque.frangosSemRecheio },
+    { titulo: "Meio Frango", icone: frangoIcon, estoque: estoque.meioFrango        },
   ];
 
   return (
@@ -92,6 +94,31 @@ export default function Dashboard() {
           <h3 className="text-[#0F4C3A] text-3xl font-bold mb-8">Costela</h3>
           <EstoqueCard titulo="Costela" icone={costelaIcon} estoque={estoque.costela} fullWidth />
         </>
+      )}
+
+      {/* Botões de ação — só expediente ativo */}
+      {isAtivo && (
+        <div className="grid grid-cols-2 gap-6 mt-16">
+          <button
+            onClick={() => navigate("/encomenda")}
+            className="flex items-center justify-center gap-4 bg-[#0F4C3A] 
+                       text-white text-2xl font-bold py-10 rounded-2xl
+                       hover:bg-[#0a3528] active:scale-[0.98] transition-all shadow-lg"
+          >
+            <img src={encomendaIcon} alt="Encomenda" className="w-8 h-8 brightness-0 invert" />
+            Encomenda
+          </button>
+
+          <button
+            onClick={() => navigate("/venda")}
+            className="flex items-center justify-center gap-4 border-2 border-[#0F4C3A]
+                       text-[#0F4C3A] text-2xl font-bold py-10 rounded-2xl
+                       hover:bg-[#0F4C3A]/5 active:scale-[0.98] transition-all shadow-sm"
+          >
+            <img src={vendaIcon} alt="Venda" className="w-8 h-8" />
+            Venda Rápida
+          </button>
+        </div>
       )}
 
     </div>
