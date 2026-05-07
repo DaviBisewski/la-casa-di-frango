@@ -4,7 +4,6 @@ import { useExpediente } from "../hooks/useExpediente";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
-import { InputGroup } from "../components/Forms/InputGroup";
 
 import frangoIcon from "../assets/icons/frango.svg";
 import maioneseIcon from "../assets/icons/maionese.svg";
@@ -16,6 +15,25 @@ const FILTROS = [
   { key: "maioneses", label: "Maioneses", icone: maioneseIcon },
   { key: "costela",   label: "Costela",   icone: costelaIcon  },
 ];
+
+function CampoTexto({ label, placeholder, value, onChange, type = "text" }) {
+  return (
+    <div className="flex flex-col gap-4 mb-10 w-full">
+      <label className="text-[#0F4C3A] text-3xl font-semibold">
+        {label}
+      </label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full bg-[#D4F1E6] text-[#0F4C3A] text-3xl p-10 rounded-2xl
+                   placeholder:text-[#0F4C3A]/40 border-2 border-transparent
+                   focus:border-[#0F4C3A]/20 outline-none transition-all shadow-inner"
+      />
+    </div>
+  );
+}
 
 export default function Encomenda() {
   const { expediente, adicionarEncomenda } = useExpediente();
@@ -46,7 +64,7 @@ export default function Encomenda() {
       .filter(([, quantidade]) => quantidade > 0)
       .map(([chave, quantidade]) => ({ chave, quantidade }));
 
-    if (!nome || itens.length === 0) return;
+    if (!nome.trim() || itens.length === 0) return;
 
     adicionarEncomenda({ nome, telefone, itens });
     navigate("/dashboard");
@@ -69,27 +87,20 @@ export default function Encomenda() {
         }).format(new Date())}
       </p>
 
-      {/* Nome */}
-      <div className="mb-8">
-        <InputGroup
-          label="Informe o nome:"
-          name="nome"
-          placeholder="João Silva"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-        />
-      </div>
+      <CampoTexto
+        label="Informe o nome:"
+        placeholder="João Silva"
+        value={nome}
+        onChange={setNome}
+      />
 
-      {/* Telefone */}
-      <div className="mb-12">
-        <InputGroup
-          label="Informe o telefone:"
-          name="telefone"
-          placeholder="(47) 99994-2292"
-          value={telefone}
-          onChange={(e) => setTelefone(e.target.value)}
-        />
-      </div>
+      <CampoTexto
+        label="Informe o telefone:"
+        placeholder="(47) 99994-2292"
+        value={telefone}
+        onChange={setTelefone}
+        type="tel"
+      />
 
       {/* Filtros — só domingo */}
       {isSunday && (
@@ -100,7 +111,7 @@ export default function Encomenda() {
         />
       )}
 
-      {/* Produtos — Frangos */}
+      {/* Frangos */}
       {(!isSunday || filtroAtivo === "frangos") && (
         <div className="mb-12">
           <ProdutoLinha
@@ -127,7 +138,7 @@ export default function Encomenda() {
         </div>
       )}
 
-      {/* Produtos — Maioneses (domingo) */}
+      {/* Maioneses (domingo) */}
       {isSunday && filtroAtivo === "maioneses" && (
         <div className="mb-12">
           <ProdutoLinha
@@ -147,7 +158,7 @@ export default function Encomenda() {
         </div>
       )}
 
-      {/* Produto — Costela (domingo) */}
+      {/* Costela (domingo) */}
       {isSunday && filtroAtivo === "costela" && (
         <div className="mb-12">
           <ProdutoLinha
