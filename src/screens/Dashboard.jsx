@@ -4,6 +4,7 @@ import { useExpediente } from "../hooks/useExpediente";
 import { EstoqueCarrossel } from "../components/Layout/EstoqueCarrosel";
 import { EstoqueCard } from "../components/Cards/EstoqueCard";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
+import { BotoesAcao } from "../components/ui/ButtonsAction";
 
 import estoqueIcon from "../assets/icons/estoque.svg";
 import ativoIcon from "../assets/icons/statusActive.svg";
@@ -11,8 +12,6 @@ import encerradoIcon from "../assets/icons/encerrado.svg";
 import frangoIcon from "../assets/icons/frango.svg";
 import maioneseIcon from "../assets/icons/maionese.svg";
 import costelaIcon from "../assets/icons/costela.svg";
-import encomendaIcon from "../assets/icons/frango.svg";
-import vendaIcon from "../assets/icons/venda.svg";
 
 const FILTROS = [
   { key: "frangos",   label: "Frangos",   icone: frangoIcon   },
@@ -42,19 +41,19 @@ export default function Dashboard() {
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
-      {/* Cabeçalho */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <img src={estoqueIcon} alt="Estoque" className="w-10 h-10" />
-          <h2 className="text-[#0F4C3A] text-4xl font-extrabold">Estoque</h2>
+      {/* Cabeçalho — estoque + status maiores */}
+      <div className="flex items-center justify-between mb-12">
+        <div className="flex items-center gap-5">
+          <img src={estoqueIcon} alt="Estoque" className="w-14 h-14" />
+          <h2 className="text-[#0F4C3A] text-5xl font-extrabold">Estoque</h2>
         </div>
 
-        <span className="flex items-center gap-3 bg-[#0F4C3A] text-white
-                         text-2xl font-semibold px-8 py-4 rounded-full">
+        <span className="flex items-center gap-4 bg-[#0F4C3A] text-white
+                         text-2xl font-semibold px-10 py-5 rounded-full">
           <img
             src={isAtivo ? ativoIcon : encerradoIcon}
             alt={isAtivo ? "Ativo" : "Encerrado"}
-            className="w-6 h-6 brightness-0 invert"
+            className="w-8 h-8 brightness-0 invert"
           />
           {isAtivo ? "Ativo" : "Encerrado"}
         </span>
@@ -71,55 +70,24 @@ export default function Dashboard() {
 
       {/* Frangos */}
       {(!isSunday || filtroAtivo === "frangos") && (
-        <>
-          <h3 className="text-[#0F4C3A] text-3xl font-bold mb-8">Frangos</h3>
-          <EstoqueCarrossel items={itemsFrangos} />
-        </>
+        <EstoqueCarrossel items={itemsFrangos} />
       )}
 
       {/* Maioneses */}
       {isSunday && filtroAtivo === "maioneses" && (
-        <>
-          <h3 className="text-[#0F4C3A] text-3xl font-bold mb-8">Maioneses</h3>
-          <div className="grid grid-cols-2 gap-6">
-            <EstoqueCard titulo="Maionese R$10,00" icone={maioneseIcon} estoque={estoque.maionese10} fullWidth />
-            <EstoqueCard titulo="Maionese R$15,00" icone={maioneseIcon} estoque={estoque.maionese15} fullWidth />
-          </div>
-        </>
+        <div className="grid grid-cols-2 gap-6">
+          <EstoqueCard titulo="Maionese R$10,00" icone={maioneseIcon} estoque={estoque.maionese10} fullWidth />
+          <EstoqueCard titulo="Maionese R$15,00" icone={maioneseIcon} estoque={estoque.maionese15} fullWidth />
+        </div>
       )}
 
       {/* Costela */}
       {isSunday && filtroAtivo === "costela" && (
-        <>
-          <h3 className="text-[#0F4C3A] text-3xl font-bold mb-8">Costela</h3>
-          <EstoqueCard titulo="Costela" icone={costelaIcon} estoque={estoque.costela} fullWidth />
-        </>
+        <EstoqueCard titulo="Costela" icone={costelaIcon} estoque={estoque.costela} fullWidth />
       )}
 
-      {/* Botões de ação — só expediente ativo */}
-      {isAtivo && (
-        <div className="grid grid-cols-2 gap-6 mt-16">
-          <button
-            onClick={() => navigate("/encomenda")}
-            className="flex items-center justify-center gap-4 bg-[#0F4C3A] 
-                       text-white text-2xl font-bold py-10 rounded-2xl
-                       hover:bg-[#0a3528] active:scale-[0.98] transition-all shadow-lg"
-          >
-            <img src={encomendaIcon} alt="Encomenda" className="w-8 h-8 brightness-0 invert" />
-            Encomenda
-          </button>
-
-          <button
-            onClick={() => navigate("/venda")}
-            className="flex items-center justify-center gap-4 border-2 border-[#0F4C3A]
-                       text-[#0F4C3A] text-2xl font-bold py-10 rounded-2xl
-                       hover:bg-[#0F4C3A]/5 active:scale-[0.98] transition-all shadow-sm"
-          >
-            <img src={vendaIcon} alt="Venda" className="w-8 h-8" />
-            Venda Rápida
-          </button>
-        </div>
-      )}
+      {/* Botões de ação */}
+      {isAtivo && <BotoesAcao />}
 
     </div>
   );
