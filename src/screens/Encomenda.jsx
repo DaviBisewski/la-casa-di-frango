@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
+import { useToast } from "../contexts/ToastContext";
+import { MENSAGENS } from "../services/toastService";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
-import { notificarSucesso, notificarErro, notificarAviso, MENSAGENS } from "../utils/toastConfig";
 import { expedienteService } from "../services/expedienteService";
 
 import frangoIcon from "../assets/icons/frango.svg";
@@ -39,6 +40,7 @@ function CampoTexto({ label, placeholder, value, onChange, type = "text" }) {
 
 export default function Encomenda() {
   const { expediente, adicionarEncomenda } = useExpediente();
+  const { mostrar } = useToast();
   const navigate = useNavigate();
 
   const [nome, setNome] = useState("");
@@ -61,53 +63,20 @@ export default function Encomenda() {
     return expedienteService.getDisponivel(expediente, chave);
   }
 
-  /**
-   * Atualiza a quantidade de um produto específico
-   * @param {string} chave - Identificador do produto
-   * @param {number} valor - Quantidade a atualizar
-   */
   function setQtd(chave, valor) {
     setQtds((prev) => ({ ...prev, [chave]: valor }));
   }
 
-  /**
-   * Submete uma nova encomenda
-   * Valida dados, calcula itens não vazios, e salva a encomenda
-   * Notifica o usuário sobre sucesso, aviso de falta de estoque ou erro
-   */
   function handleSubmit() {
-    try {
-      const itens = Object.entries(qtds)
-        .filter(([, quantidade]) => quantidade > 0)
-        .map(([chave, quantidade]) => ({ chave, quantidade }));
+    const itens = Object.entries(qtds)
+      .filter(([, quantidade]) => quantidade > 0)
+      .map(([chave, quantidade]) => ({ chave, quantidade }));
 
-      if (!nome.trim() || itens.length === 0) {
-        notificarAviso('Preenchcha o nome do cliente e selecione pelo menos um produto');
-        return;
-      }
+    if (!nome.trim() || itens.length === 0) return;
 
-      adicionarEncomenda({ nome, telefone, itens });
-      
-      // Calcula quantidade em falta para informar ao usuário
-      let totalEmFalta = 0;
-      itens.forEach(({ chave, quantidade }) => {
-        const disponivel = expedienteService.getDisponivel(expediente, chave);
-        if (quantidade > disponivel) {
-          totalEmFalta += quantidade - disponivel;
-        }
-      });
-
-      if (totalEmFalta > 0) {
-        notificarAviso(MENSAGENS.ENCOMENDA_EM_FALTA(totalEmFalta));
-      } else {
-        notificarSucesso(MENSAGENS.ENCOMENDA_ADICIONADA);
-      }
-      
-      navigate("/dashboard");
-    } catch (erro) {
-      notificarErro(MENSAGENS.ERRO_GENERICO);
-      console.error('Erro ao adicionar encomenda:', erro);
-    }
+    adicionarEncomenda({ nome, telefone, itens });
+    mostrar(MENSAGENS.ENCOMENDA_ADICIONADA, "sucesso");
+    navigate("/dashboard");
   }
 
   return (

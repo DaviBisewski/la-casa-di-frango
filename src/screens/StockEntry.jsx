@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
+import { useToast } from "../contexts/ToastContext";
+import { MENSAGENS } from "../services/toastService";
 import { InputGroup } from "../components/Forms/InputGroup";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
-import { notificarSucesso, notificarErro, MENSAGENS } from "../utils/toastConfig";
 import stockIcon from '../assets/icons/frango.svg';
 
 export default function StockEntry() {
   const { iniciarExpedienteComEstoque } = useExpediente();
+  const { mostrar } = useToast();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -29,20 +31,10 @@ export default function StockEntry() {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  /**
-   * Submete o formulário de estoque inicial
-   * Inicia um novo expediente com as quantidades informadas
-   * Notifica o usuário de sucesso ou erro
-   */
   function handleSubmit() {
-    try {
-      iniciarExpedienteComEstoque(form);
-      notificarSucesso(MENSAGENS.EXPEDIENTE_CRIADO);
-      navigate("/dashboard");
-    } catch (erro) {
-      notificarErro(MENSAGENS.ERRO_GENERICO);
-      console.error('Erro ao iniciar expediente:', erro);
-    }
+    iniciarExpedienteComEstoque(form);
+    mostrar(MENSAGENS.EXPEDIENTE_CRIADO, "sucesso");
+    navigate("/dashboard");
   }
 
   return (

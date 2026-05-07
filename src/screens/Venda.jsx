@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
-import { notificarSucesso, notificarErro, notificarAviso, MENSAGENS } from "../utils/toastConfig";
+import { useToast } from "../contexts/ToastContext";
+import { MENSAGENS } from "../services/toastService";
 import { expedienteService } from "../services/expedienteService";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
@@ -20,6 +21,7 @@ const FILTROS = [
 
 export default function Venda() {
   const { expediente, adicionarVenda } = useExpediente();
+  const { mostrar } = useToast();
   const navigate = useNavigate();
 
   const [filtroAtivo, setFiltroAtivo] = useState("frangos");
@@ -40,51 +42,20 @@ export default function Venda() {
     return expedienteService.getDisponivel(expediente, chave);
   }
 
-  /**
-   * Atualiza a quantidade de um produto específico
-   * @param {string} chave - Identificador do produto
-   * @param {number} valor - Quantidade a atualizar
-   */
   function setQtd(chave, valor) {
     setQtds((prev) => ({ ...prev, [chave]: valor }));
   }
 
-  /**
-   * Submete uma nova venda
-   * Valida se há itens selecionados e registra a venda no expediente
-   * Notifica o usuário sobre sucesso, aviso de quantidade insuficiente ou erro
-   */
   function handleSubmit() {
-    try {
-      const itens = Object.entries(qtds)
-        .filter(([, quantidade]) => quantidade > 0)
-        .map(([chave, quantidade]) => ({ chave, quantidade }));
+    const itens = Object.entries(qtds)
+      .filter(([, quantidade]) => quantidade > 0)
+      .map(([chave, quantidade]) => ({ chave, quantidade }));
 
-      if (itens.length === 0) {
-        notificarAviso('Selecione pelo menos um produto para vender');
-        return;
-      }
+    if (itens.length === 0) return;
 
-      // Verifica se há quantidade suficiente disponível
-      let quantidadeInsuficiente = false;
-      itens.forEach(({ chave, quantidade }) => {
-        const disponivel = expedienteService.getDisponivel(expediente, chave);
-        if (quantidade > disponivel) {
-          quantidadeInsuficiente = true;
-        }
-      });
-
-      if (quantidadeInsuficiente) {
-        notificarAviso(MENSAGENS.QUANTIDADE_INSUFICIENTE);
-      }
-
-      adicionarVenda({ itens });
-      notificarSucesso(MENSAGENS.VENDA_REGISTRADA);
-      navigate("/dashboard");
-    } catch (erro) {
-      notificarErro(MENSAGENS.ERRO_GENERICO);
-      console.error('Erro ao registrar venda:', erro);
-    }
+    adicionarVenda({ itens });
+    mostrar(MENSAGENS.VENDA_REGISTRADA, "sucesso");
+    navigate("/dashboard");
   }
 
   return (

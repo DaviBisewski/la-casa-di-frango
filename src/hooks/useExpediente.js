@@ -3,31 +3,26 @@ import { storage } from "../services/storage";
 import { expedienteService } from "../services/expedienteService";
 
 /**
- * Hook para gerenciar o expediente (operação do dia)
- * Mantém estado do expediente ativo e fornece funções para manipulá-lo
- * 
- * @returns {
- *   expediente: Object|null - Expediente atual ou null se não existe
- *   iniciarExpedienteComEstoque: Function - Cria novo expediente
- *   adicionarEncomenda: Function - Adiciona encomenda ao expediente
- *   adicionarVenda: Function - Adiciona venda ao expediente
- *   verExpediente: Function - Muda expediente visualizado
- *   getHistorico: Function - Retorna histórico de expedientes
- * }
+ * Hook principal para gerenciar o estado do expediente
+ * Responsável apenas pelo estado React — a lógica de negócio
+ * fica no expedienteService e a persistência no storage
  */
 export function useExpediente() {
+  /** Estado do expediente atual carregado do localStorage */
   const [expediente, setExpediente] = useState(null);
 
-  // Carrega expediente do localStorage ao montar o componente
+  /**
+   * Carrega o expediente salvo ao montar o componente
+   * Garante que o estado seja restaurado após recarregar a página
+   */
   useEffect(() => {
     const salvo = storage.getExpedienteAtual();
     if (salvo) setExpediente(salvo);
   }, []);
 
   /**
-   * Inicia um novo expediente com o estãgio de produtos do dia
-   * Cria registro único e salva em histórico
-   * @param {Object} form - Quantidades iniciais de cada produto
+   * Inicia um novo expediente com as quantidades de estoque informadas
+   * @param {Object} form - Dados do formulário de estoque inicial
    */
   function iniciarExpedienteComEstoque(form) {
     const novo = expedienteService.criar(form);
@@ -35,9 +30,8 @@ export function useExpediente() {
   }
 
   /**
-   * Adiciona uma encomenda (pedido do cliente) ao expediente
-   * Não desconta do estãgio, apenas registra o pedido
-   * @param {Object} dados - Nome, telefone e itens da encomenda
+   * Adiciona uma encomenda ao expediente atual
+   * @param {Object} dados - { nome, telefone, itens }
    */
   function adicionarEncomenda(dados) {
     const atualizado = expedienteService.adicionarEncomenda(expediente, dados);
@@ -45,9 +39,8 @@ export function useExpediente() {
   }
 
   /**
-   * Registra uma venda (venda rápida/balcão) no expediente
-   * Não desconta do estãgio, apenas registra a venda
-   * @param {Object} dados - Itens vendidos e quantidade de cada
+   * Registra uma venda rápida no expediente atual
+   * @param {Object} dados - { itens }
    */
   function adicionarVenda(dados) {
     const atualizado = expedienteService.adicionarVenda(expediente, dados);
@@ -55,16 +48,27 @@ export function useExpediente() {
   }
 
   /**
-   * Muda o expediente visualizado (para ver histórico)
-   * @param {Object} exp - Expediente a visualizar
+   * Marca um pedido como retirado pelo cliente
+   * @param {number} pedidoId - ID do pedido a ser marcado
+   */
+  function marcarRetirado(pedidoId) {
+    const atualizado = expedienteService.marcarRetirado(expediente, pedidoId);
+    setExpediente(atualizado);
+  }
+
+  /**
+   * Carrega um expediente do histórico para visualização
+   * Substitui o expediente atual no estado
+   * @param {Object} exp - Expediente do histórico
    */
   function verExpediente(exp) {
     setExpediente(exp);
   }
 
   /**
-   * Retorna o histórico de todos os expedientes
-   * @returns {Array} Lista de expedientes em ordem decrescente (mais recente primeiro)
+   * Retorna todos os expedientes salvos em ordem decrescente
+   * O mais recente aparece primeiro
+   * @returns {Array} Lista de expedientes
    */
   function getHistorico() {
     return storage.getHistorico();
@@ -75,7 +79,8 @@ export function useExpediente() {
     iniciarExpedienteComEstoque,
     adicionarEncomenda,
     adicionarVenda,
+    marcarRetirado,
     verExpediente,
     getHistorico,
   };
-}
+} 

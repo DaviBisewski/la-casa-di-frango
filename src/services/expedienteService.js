@@ -3,21 +3,22 @@ import { storage } from "./storage";
 /**
  * Service de lógica de negócio do expediente
  * Contém funções para criar, atualizar e calcular dados do expediente
- * 
- * Nota: O sistema não desconta automaticamente do estãgio
+ *
+ * Nota: O sistema não desconta automaticamente do estoque.
  * As quantidades disponíveis são calculadas como:
- * Disponível = Estãgio Original - Encomendas - Vendas
+ * Disponível = Estoque Original - Encomendas - Vendas
  */
 export const expedienteService = {
+
   /**
-   * Cria um novo expediente com o estãgio inicial do dia
+   * Cria um novo expediente com o estoque inicial do dia
    * @param {Object} form - Valores do formulário com quantidades iniciais
    * @returns {Object} Novo expediente criado
    */
   criar(form) {
     const hoje = new Date().toISOString().split("T")[0];
     const isSunday = new Date().getDay() === 0;
-    const timestamp = Date.now(); // ID único mesmo no mesmo dia
+    const timestamp = Date.now();
 
     const novoExpediente = {
       id: `${hoje}-${timestamp}`,
@@ -48,7 +49,6 @@ export const expedienteService = {
    * @param {string} chave - Identificador do produto (ex: 'frangosComRecheio')
    * @returns {number} Total encomendado
    */
-  // soma tudo que foi encomendado de um produto
   getTotalEncomendado(expediente, chave) {
     return (expediente.pedidos || []).reduce((total, pedido) => {
       const item = (pedido.itens || []).find((i) => i.chave === chave);
@@ -60,10 +60,9 @@ export const expedienteService = {
    * Calcula o total vendido de um produto
    * Soma todas as vendas daquele produto no expediente
    * @param {Object} expediente - Expediente atual
-   * @param {string} chave - Identificador do produto (ex: 'frangosComRecheio')
+   * @param {string} chave - Identificador do produto
    * @returns {number} Total vendido
    */
-  // soma tudo que foi vendido de um produto
   getTotalVendido(expediente, chave) {
     return (expediente.vendas || []).reduce((total, venda) => {
       const item = (venda.itens || []).find((i) => i.chave === chave);
@@ -73,12 +72,11 @@ export const expedienteService = {
 
   /**
    * Calcula a quantidade disponível de um produto
-   * Fórmula: Estãgio Original - Encomendas - Vendas
+   * Fórmula: Estoque Original - Encomendas - Vendas
    * @param {Object} expediente - Expediente atual
    * @param {string} chave - Identificador do produto
-   * @returns {number} Quantidade disponível para nova encomenda ou venda
+   * @returns {number} Quantidade disponível
    */
-  // estoque original - encomendas - vendas
   getDisponivel(expediente, chave) {
     const original    = expediente.estoque[chave] || 0;
     const encomendado = this.getTotalEncomendado(expediente, chave);
@@ -87,19 +85,46 @@ export const expedienteService = {
   },
 
   /**
-   * Adiciona uma encomenda (pedido do cliente) ao expediente
-   * IMPORTANTE: Não desconta do estãgio, apenas registra o pedido
+   * Marca um pedido como retirado pelo cliente
+   * Atualiza a flag 'retirado' do pedido para true
    * @param {Object} expediente - Expediente atual
-   * @param {Object} dados - Dados da encomenda {nome, telefone, itens}
+   * @param {number} pedidoId - ID do pedido a ser marcado
+   * @returns {Object} Expediente atualizado
+   */
+  marcarRetirado(expediente, pedidoId) {
+    const atualizado = {
+      ...expediente,
+      pedidos: expediente.pedidos.map((p) =>
+        p.id === pedidoId ? { ...p, retirado: true } : p
+      ),
+    };
+
+    storage.salvarExpedienteAtual(atualizado);
+    storage.atualizarExpedienteNoDB(atualizado);
+    return atualizado;
+  },
+
+  /**
+   * Adiciona uma encomenda ao expediente
+   * NÃO desconta do estoque — apenas registra o pedido
+   * O disponível é calculado dinamicamente via getDisponivel()
+   * @param {Object} expediente - Expediente atual
+   * @param {Object} dados - { nome, telefone, itens }
    * @returns {Object} Expediente atualizado
    */
   adicionarEncomenda(expediente, { nome, telefone, itens }) {
-    // 🔥 NÃO desconta do estoque — apenas registra o pedido
     const atualizado = {
       ...expediente,
       pedidos: [
         ...expediente.pedidos,
-        { id: Date.now(), tipo: "encomenda", nome, telefone, itens },
+        {
+          id: Date.now(),
+          tipo: "encomenda",
+          nome,
+          telefone,
+          itens,
+          retirado: false, // começa sempre como pendente
+        },
       ],
     };
 
@@ -109,19 +134,23 @@ export const expedienteService = {
   },
 
   /**
-   * Registra uma venda rápida (venda no balão) no expediente
-   * IMPORTANTE: Não desconta do estãgio, apenas registra a venda
+   * Registra uma venda rápida no expediente
+   * NÃO desconta do estoque — apenas registra a venda
+   * O disponível é calculado dinamicamente via getDisponivel()
    * @param {Object} expediente - Expediente atual
-   * @param {Object} dados - Dados da venda {itens}
+   * @param {Object} dados - { itens }
    * @returns {Object} Expediente atualizado
    */
   adicionarVenda(expediente, { itens }) {
-    // 🔥 NÃO desconta do estoque — apenas registra a venda
     const atualizado = {
       ...expediente,
       vendas: [
         ...expediente.vendas,
-        { id: Date.now(), tipo: "venda", itens },
+        {
+          id: Date.now(),
+          tipo: "venda",
+          itens,
+        },
       ],
     };
 
