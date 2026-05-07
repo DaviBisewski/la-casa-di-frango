@@ -4,6 +4,7 @@ import { useExpediente } from "../hooks/useExpediente";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
+import { expedienteService } from "../services/expedienteService";
 
 import frangoIcon from "../assets/icons/frango.svg";
 import maioneseIcon from "../assets/icons/maionese.svg";
@@ -53,7 +54,12 @@ export default function Encomenda() {
 
   if (!expediente) return null;
 
-  const { estoque, isSunday } = expediente;
+  const { isSunday } = expediente;
+
+  // 🔥 disponível = estoque original - encomendas - vendas
+  function disponivel(chave) {
+    return expedienteService.getDisponivel(expediente, chave);
+  }
 
   function setQtd(chave, valor) {
     setQtds((prev) => ({ ...prev, [chave]: valor }));
@@ -73,7 +79,6 @@ export default function Encomenda() {
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
-      {/* Título */}
       <div className="flex items-center gap-4 mb-4">
         <img src={encomendaIcon} alt="Encomenda" className="w-10 h-10" />
         <h2 className="text-[#0F4C3A] text-4xl font-extrabold">
@@ -102,7 +107,6 @@ export default function Encomenda() {
         type="tel"
       />
 
-      {/* Filtros — só domingo */}
       {isSunday && (
         <EstoqueFiltros
           filtros={FILTROS}
@@ -111,7 +115,6 @@ export default function Encomenda() {
         />
       )}
 
-      {/* Frangos */}
       {(!isSunday || filtroAtivo === "frangos") && (
         <div className="mb-12">
           <ProdutoLinha
@@ -119,26 +122,25 @@ export default function Encomenda() {
             titulo="Frango S/R"
             quantidade={qtds.frangosSemRecheio}
             onChange={(v) => setQtd("frangosSemRecheio", v)}
-            max={estoque.frangosSemRecheio}
+            max={disponivel("frangosSemRecheio")}
           />
           <ProdutoLinha
             icone={frangoIcon}
             titulo="Frango C/R"
             quantidade={qtds.frangosComRecheio}
             onChange={(v) => setQtd("frangosComRecheio", v)}
-            max={estoque.frangosComRecheio}
+            max={disponivel("frangosComRecheio")}
           />
           <ProdutoLinha
             icone={frangoIcon}
             titulo="Meio Frango"
             quantidade={qtds.meioFrango}
             onChange={(v) => setQtd("meioFrango", v)}
-            max={estoque.meioFrango}
+            max={disponivel("meioFrango")}
           />
         </div>
       )}
 
-      {/* Maioneses (domingo) */}
       {isSunday && filtroAtivo === "maioneses" && (
         <div className="mb-12">
           <ProdutoLinha
@@ -146,19 +148,18 @@ export default function Encomenda() {
             titulo="Maionese R$10,00"
             quantidade={qtds.maionese10}
             onChange={(v) => setQtd("maionese10", v)}
-            max={estoque.maionese10}
+            max={disponivel("maionese10")}
           />
           <ProdutoLinha
             icone={maioneseIcon}
             titulo="Maionese R$15,00"
             quantidade={qtds.maionese15}
             onChange={(v) => setQtd("maionese15", v)}
-            max={estoque.maionese15}
+            max={disponivel("maionese15")}
           />
         </div>
       )}
 
-      {/* Costela (domingo) */}
       {isSunday && filtroAtivo === "costela" && (
         <div className="mb-12">
           <ProdutoLinha
@@ -166,7 +167,7 @@ export default function Encomenda() {
             titulo="Costela"
             quantidade={qtds.costela}
             onChange={(v) => setQtd("costela", v)}
-            max={estoque.costela}
+            max={disponivel("costela")}
           />
         </div>
       )}

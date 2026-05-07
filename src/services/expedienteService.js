@@ -24,43 +24,60 @@ export const expedienteService = {
 
     storage.adicionarExpedienteToDB(novoExpediente);
     storage.salvarExpedienteAtual(novoExpediente);
-
     return novoExpediente;
   },
 
+  // soma tudo que foi encomendado de um produto
+  getTotalEncomendado(expediente, chave) {
+    return (expediente.pedidos || []).reduce((total, pedido) => {
+      const item = (pedido.itens || []).find((i) => i.chave === chave);
+      return total + (item ? item.quantidade : 0);
+    }, 0);
+  },
+
+  // soma tudo que foi vendido de um produto
+  getTotalVendido(expediente, chave) {
+    return (expediente.vendas || []).reduce((total, venda) => {
+      const item = (venda.itens || []).find((i) => i.chave === chave);
+      return total + (item ? item.quantidade : 0);
+    }, 0);
+  },
+
+  // estoque original - encomendas - vendas
+  getDisponivel(expediente, chave) {
+    const original    = expediente.estoque[chave] || 0;
+    const encomendado = this.getTotalEncomendado(expediente, chave);
+    const vendido     = this.getTotalVendido(expediente, chave);
+    return original - encomendado - vendido;
+  },
+
   adicionarEncomenda(expediente, { nome, telefone, itens }) {
-    const atualizado = { ...expediente, estoque: { ...expediente.estoque } };
-
-    itens.forEach(({ chave, quantidade }) => {
-      atualizado.estoque[chave] -= quantidade;
-    });
-
-    atualizado.pedidos = [
-      ...atualizado.pedidos,
-      { id: Date.now(), tipo: "encomenda", nome, telefone, itens },
-    ];
+    // 🔥 NÃO desconta do estoque — apenas registra o pedido
+    const atualizado = {
+      ...expediente,
+      pedidos: [
+        ...expediente.pedidos,
+        { id: Date.now(), tipo: "encomenda", nome, telefone, itens },
+      ],
+    };
 
     storage.salvarExpedienteAtual(atualizado);
     storage.atualizarExpedienteNoDB(atualizado);
-
     return atualizado;
   },
 
   adicionarVenda(expediente, { itens }) {
-    const atualizado = { ...expediente, estoque: { ...expediente.estoque } };
-
-    itens.forEach(({ chave, quantidade }) => {
-      atualizado.estoque[chave] -= quantidade;
-    });
-
-    atualizado.vendas = [
-      ...atualizado.vendas,
-      { id: Date.now(), tipo: "venda", itens },
-    ];
+    // 🔥 NÃO desconta do estoque — apenas registra a venda
+    const atualizado = {
+      ...expediente,
+      vendas: [
+        ...expediente.vendas,
+        { id: Date.now(), tipo: "venda", itens },
+      ],
+    };
 
     storage.salvarExpedienteAtual(atualizado);
     storage.atualizarExpedienteNoDB(atualizado);
-
     return atualizado;
   },
 };

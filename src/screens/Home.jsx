@@ -16,11 +16,8 @@ export default function Home() {
 
   return (
     <div className="max-w-[1400px] mx-auto">
-
-      {/* 🔥 Botão começar expediente */}
       <StartShift onStart={() => navigate("/estoque")} />
 
-      {/* 🔥 Histórico de Vendas */}
       {historico.length > 0 && (
         <section className="px-12 mt-20 pb-20">
           <div className="flex items-center justify-between mb-10">

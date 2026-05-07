@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
+import { expedienteService } from "../services/expedienteService";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
@@ -34,6 +35,11 @@ export default function Venda() {
 
   const { estoque, isSunday } = expediente;
 
+  // disponível = estoque original - encomendas - vendas
+  function disponivel(chave) {
+    return expedienteService.getDisponivel(expediente, chave);
+  }
+
   function setQtd(chave, valor) {
     setQtds((prev) => ({ ...prev, [chave]: valor }));
   }
@@ -52,7 +58,6 @@ export default function Venda() {
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
-      {/* Título */}
       <div className="flex items-center gap-4 mb-4">
         <img src={vendaIcon} alt="Venda" className="w-10 h-10" />
         <h2 className="text-[#0F4C3A] text-4xl font-extrabold">
@@ -66,7 +71,6 @@ export default function Venda() {
         }).format(new Date())}
       </p>
 
-      {/* Filtros — só domingo */}
       {isSunday && (
         <EstoqueFiltros
           filtros={FILTROS}
@@ -75,7 +79,6 @@ export default function Venda() {
         />
       )}
 
-      {/* Frangos */}
       {(!isSunday || filtroAtivo === "frangos") && (
         <div className="mb-12">
           <ProdutoLinha
@@ -102,7 +105,6 @@ export default function Venda() {
         </div>
       )}
 
-      {/* Maioneses (domingo) */}
       {isSunday && filtroAtivo === "maioneses" && (
         <div className="mb-12">
           <ProdutoLinha
@@ -122,7 +124,6 @@ export default function Venda() {
         </div>
       )}
 
-      {/* Costela (domingo) */}
       {isSunday && filtroAtivo === "costela" && (
         <div className="mb-12">
           <ProdutoLinha
@@ -130,7 +131,7 @@ export default function Venda() {
             titulo="Costela"
             quantidade={qtds.costela}
             onChange={(v) => setQtd("costela", v)}
-            max={estoque.costela}
+            max={disponivel("costela")}
           />
         </div>
       )}

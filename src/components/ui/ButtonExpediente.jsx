@@ -9,7 +9,7 @@ const StartShift = ({ onStart }) => {
       </h2>
 
       <button 
-        onClick={onStart} // 🔥 AQUI
+        onClick={onStart}
         className="w-full bg-[#0F4C3A] hover:bg-[#0a3528] active:scale-[0.98] transition-all 
                    rounded-[20px] py-20 flex items-center justify-center gap-20 shadow-lg group mt-20"
       >

@@ -33,15 +33,26 @@ export default function Dashboard() {
   const isAtivo = status === "active";
 
   const itemsFrangos = [
-    { titulo: "Frangos C/R", icone: frangoIcon, estoque: estoque.frangosComRecheio },
-    { titulo: "Frangos S/R", icone: frangoIcon, estoque: estoque.frangosSemRecheio },
-    { titulo: "Meio Frango", icone: frangoIcon, estoque: estoque.meioFrango        },
+    {
+      titulo: "Frangos C/R",
+      icone: frangoIcon,
+      chave: "frangosComRecheio",
+    },
+    {
+      titulo: "Frangos S/R",
+      icone: frangoIcon,
+      chave: "frangosSemRecheio",
+    },
+    {
+      titulo: "Meio Frango",
+      icone: frangoIcon,
+      chave: "meioFrango",
+    },
   ];
 
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
-      {/* Cabeçalho — estoque + status maiores */}
       <div className="flex items-center justify-between mb-12">
         <div className="flex items-center gap-5">
           <img src={estoqueIcon} alt="Estoque" className="w-14 h-14" />
@@ -59,7 +70,6 @@ export default function Dashboard() {
         </span>
       </div>
 
-      {/* Filtros — só domingo */}
       {isSunday && (
         <EstoqueFiltros
           filtros={FILTROS}
@@ -68,25 +78,39 @@ export default function Dashboard() {
         />
       )}
 
-      {/* Frangos */}
       {(!isSunday || filtroAtivo === "frangos") && (
-        <EstoqueCarrossel items={itemsFrangos} />
+        <EstoqueCarrossel items={itemsFrangos} expediente={expediente} />
       )}
 
-      {/* Maioneses */}
       {isSunday && filtroAtivo === "maioneses" && (
         <div className="grid grid-cols-2 gap-6">
-          <EstoqueCard titulo="Maionese R$10,00" icone={maioneseIcon} estoque={estoque.maionese10} fullWidth />
-          <EstoqueCard titulo="Maionese R$15,00" icone={maioneseIcon} estoque={estoque.maionese15} fullWidth />
+          <EstoqueCard
+            titulo="Maionese R$10,00"
+            icone={maioneseIcon}
+            expediente={expediente}
+            chave="maionese10"
+            fullWidth
+          />
+          <EstoqueCard
+            titulo="Maionese R$15,00"
+            icone={maioneseIcon}
+            expediente={expediente}
+            chave="maionese15"
+            fullWidth
+          />
         </div>
       )}
 
-      {/* Costela */}
       {isSunday && filtroAtivo === "costela" && (
-        <EstoqueCard titulo="Costela" icone={costelaIcon} estoque={estoque.costela} fullWidth />
+        <EstoqueCard
+          titulo="Costela"
+          icone={costelaIcon}
+          expediente={expediente}
+          chave="costela"
+          fullWidth
+        />
       )}
 
-      {/* Botões de ação */}
       {isAtivo && <BotoesAcao />}
 
     </div>
