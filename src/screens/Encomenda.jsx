@@ -4,6 +4,7 @@ import { useExpediente } from "../hooks/useExpediente";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
+import { notificarSucesso, notificarErro, notificarAviso, MENSAGENS } from "../utils/toastConfig";
 import { expedienteService } from "../services/expedienteService";
 
 import frangoIcon from "../assets/icons/frango.svg";
@@ -19,8 +20,8 @@ const FILTROS = [
 
 function CampoTexto({ label, placeholder, value, onChange, type = "text" }) {
   return (
-    <div className="flex flex-col gap-4 mb-10 w-full">
-      <label className="text-[#0F4C3A] text-3xl font-semibold">
+    <div className="flex flex-col gap-4 mb-12 w-full">
+      <label className="text-[#0F4C3A] text-4xl font-semibold">
         {label}
       </label>
       <input
@@ -56,37 +57,71 @@ export default function Encomenda() {
 
   const { isSunday } = expediente;
 
-  // 🔥 disponível = estoque original - encomendas - vendas
   function disponivel(chave) {
     return expedienteService.getDisponivel(expediente, chave);
   }
 
+  /**
+   * Atualiza a quantidade de um produto específico
+   * @param {string} chave - Identificador do produto
+   * @param {number} valor - Quantidade a atualizar
+   */
   function setQtd(chave, valor) {
     setQtds((prev) => ({ ...prev, [chave]: valor }));
   }
 
+  /**
+   * Submete uma nova encomenda
+   * Valida dados, calcula itens não vazios, e salva a encomenda
+   * Notifica o usuário sobre sucesso, aviso de falta de estoque ou erro
+   */
   function handleSubmit() {
-    const itens = Object.entries(qtds)
-      .filter(([, quantidade]) => quantidade > 0)
-      .map(([chave, quantidade]) => ({ chave, quantidade }));
+    try {
+      const itens = Object.entries(qtds)
+        .filter(([, quantidade]) => quantidade > 0)
+        .map(([chave, quantidade]) => ({ chave, quantidade }));
 
-    if (!nome.trim() || itens.length === 0) return;
+      if (!nome.trim() || itens.length === 0) {
+        notificarAviso('Preenchcha o nome do cliente e selecione pelo menos um produto');
+        return;
+      }
 
-    adicionarEncomenda({ nome, telefone, itens });
-    navigate("/dashboard");
+      adicionarEncomenda({ nome, telefone, itens });
+      
+      // Calcula quantidade em falta para informar ao usuário
+      let totalEmFalta = 0;
+      itens.forEach(({ chave, quantidade }) => {
+        const disponivel = expedienteService.getDisponivel(expediente, chave);
+        if (quantidade > disponivel) {
+          totalEmFalta += quantidade - disponivel;
+        }
+      });
+
+      if (totalEmFalta > 0) {
+        notificarAviso(MENSAGENS.ENCOMENDA_EM_FALTA(totalEmFalta));
+      } else {
+        notificarSucesso(MENSAGENS.ENCOMENDA_ADICIONADA);
+      }
+      
+      navigate("/dashboard");
+    } catch (erro) {
+      notificarErro(MENSAGENS.ERRO_GENERICO);
+      console.error('Erro ao adicionar encomenda:', erro);
+    }
   }
 
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
+      {/* Título */}
       <div className="flex items-center gap-4 mb-4">
-        <img src={encomendaIcon} alt="Encomenda" className="w-10 h-10" />
-        <h2 className="text-[#0F4C3A] text-4xl font-extrabold">
+        <img src={encomendaIcon} alt="Encomenda" className="w-12 h-12" />
+        <h2 className="text-[#0F4C3A] text-5xl font-extrabold">
           Informe a encomenda
         </h2>
       </div>
 
-      <p className="text-[#0F4C3A]/60 text-2xl font-medium mb-12 capitalize">
+      <p className="text-[#0F4C3A]/60 text-3xl font-medium mb-16 capitalize">
         Hoje é {new Intl.DateTimeFormat('pt-BR', {
           weekday: 'long', day: 'numeric', month: 'long'
         }).format(new Date())}
@@ -108,15 +143,17 @@ export default function Encomenda() {
       />
 
       {isSunday && (
-        <EstoqueFiltros
-          filtros={FILTROS}
-          filtroAtivo={filtroAtivo}
-          onChange={setFiltroAtivo}
-        />
+        <div className="mb-8">
+          <EstoqueFiltros
+            filtros={FILTROS}
+            filtroAtivo={filtroAtivo}
+            onChange={setFiltroAtivo}
+          />
+        </div>
       )}
 
       {(!isSunday || filtroAtivo === "frangos") && (
-        <div className="mb-12">
+        <div className="mb-16">
           <ProdutoLinha
             icone={frangoIcon}
             titulo="Frango S/R"
@@ -142,7 +179,7 @@ export default function Encomenda() {
       )}
 
       {isSunday && filtroAtivo === "maioneses" && (
-        <div className="mb-12">
+        <div className="mb-16">
           <ProdutoLinha
             icone={maioneseIcon}
             titulo="Maionese R$10,00"
@@ -161,7 +198,7 @@ export default function Encomenda() {
       )}
 
       {isSunday && filtroAtivo === "costela" && (
-        <div className="mb-12">
+        <div className="mb-16">
           <ProdutoLinha
             icone={costelaIcon}
             titulo="Costela"

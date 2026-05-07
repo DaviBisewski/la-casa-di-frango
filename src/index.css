@@ -17,3 +17,18 @@
     @apply font-sans;
   }
 }
+
+/* src/index.css */
+
+@layer utilities {
+  /* Esconder barra de scroll para Chrome, Safari e Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Esconder barra de scroll para IE, Edge e Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}     

@@ -53,18 +53,18 @@ export default function Dashboard() {
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
-      <div className="flex items-center justify-between mb-12">
+      <div className="flex items-center justify-between mb-15">
         <div className="flex items-center gap-5">
           <img src={estoqueIcon} alt="Estoque" className="w-14 h-14" />
           <h2 className="text-[#0F4C3A] text-5xl font-extrabold">Estoque</h2>
         </div>
 
-        <span className="flex items-center gap-4 bg-[#0F4C3A] text-white
-                         text-2xl font-semibold px-10 py-5 rounded-full">
+        <span className="flex items-center gap-6 bg-[#0F4C3A] text-white
+                         text-3xl font-semibold px-13 py-5 rounded-full">
           <img
             src={isAtivo ? ativoIcon : encerradoIcon}
             alt={isAtivo ? "Ativo" : "Encerrado"}
-            className="w-8 h-8 brightness-0 invert"
+            className="w-10 h-10 brightness-0 invert"
           />
           {isAtivo ? "Ativo" : "Encerrado"}
         </span>

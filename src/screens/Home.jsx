@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import StartShift from '../components/ui/ButtonExpediente';
 import { useExpediente } from '../hooks/useExpediente';
 import HistoricoCard from '../components/Cards/HistoricoCard';
+import { notificarInfo, MENSAGENS } from '../utils/toastConfig';
 import calendarioIcon from '../assets/icons/calendario.svg';
 
 export default function Home() {
@@ -9,8 +10,17 @@ export default function Home() {
   const navigate = useNavigate();
   const historico = getHistorico();
 
+  /**
+   * Muda o expediente visualizado para o selecionado no histórico
+   * Notifica ao usuário qual expediente está sendo visualizado
+   * @param {Object} exp - Objeto do expediente a visualizar
+   */
   function handleVerExpediente(exp) {
     verExpediente(exp);
+    const data = new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'short', day: 'numeric', month: 'short'
+    }).format(new Date(exp.data));
+    notificarInfo(`Visualizando expediente de ${data}`);
     navigate("/dashboard");
   }
 

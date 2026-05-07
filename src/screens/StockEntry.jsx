@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
 import { InputGroup } from "../components/Forms/InputGroup";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
+import { notificarSucesso, notificarErro, MENSAGENS } from "../utils/toastConfig";
 import stockIcon from '../assets/icons/frango.svg';
 
 export default function StockEntry() {
@@ -20,13 +21,28 @@ export default function StockEntry() {
 
   const isSunday = new Date().getDay() === 0;
 
+  /**
+   * Atualiza os valores do formulário quando o usuário digita
+   * @param {Event} e - Evento do input
+   */
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  /**
+   * Submete o formulário de estoque inicial
+   * Inicia um novo expediente com as quantidades informadas
+   * Notifica o usuário de sucesso ou erro
+   */
   function handleSubmit() {
-    iniciarExpedienteComEstoque(form);
-    navigate("/dashboard");
+    try {
+      iniciarExpedienteComEstoque(form);
+      notificarSucesso(MENSAGENS.EXPEDIENTE_CRIADO);
+      navigate("/dashboard");
+    } catch (erro) {
+      notificarErro(MENSAGENS.ERRO_GENERICO);
+      console.error('Erro ao iniciar expediente:', erro);
+    }
   }
 
   return (

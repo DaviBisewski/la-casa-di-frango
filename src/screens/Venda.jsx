@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
+import { notificarSucesso, notificarErro, notificarAviso, MENSAGENS } from "../utils/toastConfig";
 import { expedienteService } from "../services/expedienteService";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
@@ -33,99 +34,137 @@ export default function Venda() {
 
   if (!expediente) return null;
 
-  const { estoque, isSunday } = expediente;
+  const { isSunday } = expediente;
 
-  // disponível = estoque original - encomendas - vendas
   function disponivel(chave) {
     return expedienteService.getDisponivel(expediente, chave);
   }
 
+  /**
+   * Atualiza a quantidade de um produto específico
+   * @param {string} chave - Identificador do produto
+   * @param {number} valor - Quantidade a atualizar
+   */
   function setQtd(chave, valor) {
     setQtds((prev) => ({ ...prev, [chave]: valor }));
   }
 
+  /**
+   * Submete uma nova venda
+   * Valida se há itens selecionados e registra a venda no expediente
+   * Notifica o usuário sobre sucesso, aviso de quantidade insuficiente ou erro
+   */
   function handleSubmit() {
-    const itens = Object.entries(qtds)
-      .filter(([, quantidade]) => quantidade > 0)
-      .map(([chave, quantidade]) => ({ chave, quantidade }));
+    try {
+      const itens = Object.entries(qtds)
+        .filter(([, quantidade]) => quantidade > 0)
+        .map(([chave, quantidade]) => ({ chave, quantidade }));
 
-    if (itens.length === 0) return;
+      if (itens.length === 0) {
+        notificarAviso('Selecione pelo menos um produto para vender');
+        return;
+      }
 
-    adicionarVenda({ itens });
-    navigate("/dashboard");
+      // Verifica se há quantidade suficiente disponível
+      let quantidadeInsuficiente = false;
+      itens.forEach(({ chave, quantidade }) => {
+        const disponivel = expedienteService.getDisponivel(expediente, chave);
+        if (quantidade > disponivel) {
+          quantidadeInsuficiente = true;
+        }
+      });
+
+      if (quantidadeInsuficiente) {
+        notificarAviso(MENSAGENS.QUANTIDADE_INSUFICIENTE);
+      }
+
+      adicionarVenda({ itens });
+      notificarSucesso(MENSAGENS.VENDA_REGISTRADA);
+      navigate("/dashboard");
+    } catch (erro) {
+      notificarErro(MENSAGENS.ERRO_GENERICO);
+      console.error('Erro ao registrar venda:', erro);
+    }
   }
 
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
 
+      {/* Título */}
       <div className="flex items-center gap-4 mb-4">
-        <img src={vendaIcon} alt="Venda" className="w-10 h-10" />
-        <h2 className="text-[#0F4C3A] text-4xl font-extrabold">
+        <img src={vendaIcon} alt="Venda" className="w-12 h-12" />
+        <h2 className="text-[#0F4C3A] text-5xl font-extrabold">
           Venda Rápida
         </h2>
       </div>
 
-      <p className="text-[#0F4C3A]/60 text-2xl font-medium mb-12 capitalize">
+      <p className="text-[#0F4C3A]/60 text-3xl font-medium mb-16 capitalize">
         Hoje é {new Intl.DateTimeFormat('pt-BR', {
           weekday: 'long', day: 'numeric', month: 'long'
         }).format(new Date())}
       </p>
 
+      {/* Filtros — só domingo */}
       {isSunday && (
-        <EstoqueFiltros
-          filtros={FILTROS}
-          filtroAtivo={filtroAtivo}
-          onChange={setFiltroAtivo}
-        />
+        <div className="mb-8">
+          <EstoqueFiltros
+            filtros={FILTROS}
+            filtroAtivo={filtroAtivo}
+            onChange={setFiltroAtivo}
+          />
+        </div>
       )}
 
+      {/* Frangos */}
       {(!isSunday || filtroAtivo === "frangos") && (
-        <div className="mb-12">
+        <div className="mb-16">
           <ProdutoLinha
             icone={frangoIcon}
             titulo="Frango S/R"
             quantidade={qtds.frangosSemRecheio}
             onChange={(v) => setQtd("frangosSemRecheio", v)}
-            max={estoque.frangosSemRecheio}
+            max={disponivel("frangosSemRecheio")}
           />
           <ProdutoLinha
             icone={frangoIcon}
             titulo="Frango C/R"
             quantidade={qtds.frangosComRecheio}
             onChange={(v) => setQtd("frangosComRecheio", v)}
-            max={estoque.frangosComRecheio}
+            max={disponivel("frangosComRecheio")}
           />
           <ProdutoLinha
             icone={frangoIcon}
             titulo="Meio Frango"
             quantidade={qtds.meioFrango}
             onChange={(v) => setQtd("meioFrango", v)}
-            max={estoque.meioFrango}
+            max={disponivel("meioFrango")}
           />
         </div>
       )}
 
+      {/* Maioneses */}
       {isSunday && filtroAtivo === "maioneses" && (
-        <div className="mb-12">
+        <div className="mb-16">
           <ProdutoLinha
             icone={maioneseIcon}
             titulo="Maionese R$10,00"
             quantidade={qtds.maionese10}
             onChange={(v) => setQtd("maionese10", v)}
-            max={estoque.maionese10}
+            max={disponivel("maionese10")}
           />
           <ProdutoLinha
             icone={maioneseIcon}
             titulo="Maionese R$15,00"
             quantidade={qtds.maionese15}
             onChange={(v) => setQtd("maionese15", v)}
-            max={estoque.maionese15}
+            max={disponivel("maionese15")}
           />
         </div>
       )}
 
+      {/* Costela */}
       {isSunday && filtroAtivo === "costela" && (
-        <div className="mb-12">
+        <div className="mb-16">
           <ProdutoLinha
             icone={costelaIcon}
             titulo="Costela"

@@ -10,20 +10,20 @@ export function BotoesAcao() {
       <button
         onClick={() => navigate("/encomenda")}
         className="flex items-center justify-center gap-5 bg-[#0F4C3A]
-                   text-white text-3xl font-bold py-12 rounded-2xl
+                   text-white text-4xl font-bold py-12 rounded-2xl
                    hover:bg-[#0a3528] active:scale-[0.98] transition-all shadow-lg"
       >
-        <img src={plusIcon} alt="Encomenda" className="w-9 h-9 brightness-0 invert" />
+        <img src={plusIcon} alt="Encomenda" className="w-13 h-13 rounded-full bg-black/10 p-3 brightness-0 invert" />
         Encomenda
       </button>
 
       <button
         onClick={() => navigate("/venda")}
         className="flex items-center justify-center gap-5 border-2 border-[#0F4C3A]
-                   text-[#0F4C3A] text-3xl font-bold py-12 rounded-2xl
+                   text-[#0F4C3A] text-4xl font-bold py-12 rounded-2xl
                    hover:bg-[#0F4C3A]/5 active:scale-[0.98] transition-all"
       >
-        <img src={vendaIcon} alt="Venda" className="w-9 h-9" />
+        <img src={vendaIcon} alt="Venda" className="w-13 h-13 " />
         Venda
       </button>
     </div>
