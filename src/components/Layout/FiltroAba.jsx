@@ -20,8 +20,8 @@ export function FiltroAba({ abaAtiva, onChange }) {
           className={`
             flex items-center gap-5 pb-4 transition-all duration-300
             ${abaAtiva === aba.key
-              ? "text-[#0F4C3A] border-b-4 border-[#0F4C3A] scale-105"
-              : "text-[#0F4C3A]/35 border-b-4 border-transparent scale-100"
+              ? "text-[#0F4C3A] border-b-4 border-[#0F4C3A] "
+              : "text-[#0F4C3A]/35 border-b-4 border-transparent"
             }
           `}
         >

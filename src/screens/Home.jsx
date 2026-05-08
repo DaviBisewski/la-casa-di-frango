@@ -7,22 +7,34 @@ import HistoricoCard from '../components/Cards/HistoricoCard';
 import calendarioIcon from '../assets/icons/calendario.svg';
 
 export default function Home() {
-  const { expediente, getHistorico, verExpediente } = useExpediente();
+  const { getHistorico, verExpediente } = useExpediente();
   const { mostrar } = useToast();
   const navigate = useNavigate();
   const historico = getHistorico();
 
+  /**
+   * Ao clicar em um card do histórico:
+   * - Ativo → carrega no hook e vai pro dashboard
+   * - Encerrado → vai para tela de histórico passando o expediente via state
+   */
   function handleVerExpediente(exp) {
-    verExpediente(exp);
     const data = new Intl.DateTimeFormat('pt-BR', {
       weekday: 'short', day: 'numeric', month: 'short'
-    }).format(new Date(exp.date));
-    mostrar(MENSAGENS.EXPEDIENTE_VISUALIZADO(data), "info");
-    navigate("/dashboard");
+    }).format(new Date(exp.date + "T12:00:00")); // evita bug de fuso horário
+
+    if (exp.status === "active") {
+      verExpediente(exp);
+      mostrar(MENSAGENS.EXPEDIENTE_VISUALIZADO(data), "info");
+      navigate("/dashboard");
+    } else {
+      mostrar(MENSAGENS.EXPEDIENTE_VISUALIZADO(data), "info");
+      navigate("/historico", { state: { expediente: exp } });
+    }
   }
 
   return (
     <div className="max-w-[1400px] mx-auto">
+
       <StartShift onStart={() => navigate("/estoque")} />
 
       {historico.length > 0 && (
@@ -42,7 +54,7 @@ export default function Home() {
           <div className="space-y-6">
             {historico.map((exp) => (
               <HistoricoCard
-                key={exp.id}
+                key={exp.id} // 🔥 agora é único: "2026-05-07-1746123456789"
                 expediente={exp}
                 onClick={() => handleVerExpediente(exp)}
               />

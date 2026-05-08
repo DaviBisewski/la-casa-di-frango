@@ -7,6 +7,7 @@ import StockEntry from './screens/StockEntry';
 import Dashboard from './screens/Dashboard';
 import Encomenda from './screens/Encomenda';
 import Venda from './screens/Venda';
+import ExpedienteHistorico from './screens/ExpedienteHistorico';
 import Header from './components/Header/Header';
 import { HeaderMain } from './components/Header/HeaderMain';
 
@@ -23,6 +24,7 @@ function LayoutHandler() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/encomenda" element={<Encomenda />} />
         <Route path="/venda" element={<Venda />} />
+        <Route path="/historico" element={<ExpedienteHistorico />} />
       </Routes>
     </>
   );

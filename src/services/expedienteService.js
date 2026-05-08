@@ -1,30 +1,37 @@
 import { storage } from "./storage";
 
-/**
- * Service de lógica de negócio do expediente
- * Contém funções para criar, atualizar e calcular dados do expediente
- *
- * Nota: O sistema não desconta automaticamente do estoque.
- * As quantidades disponíveis são calculadas como:
- * Disponível = Estoque Original - Encomendas - Vendas
- */
 export const expedienteService = {
 
   /**
+   * Verifica se já existe um expediente ativo no banco
+   * Impede criar dois expedientes ativos ao mesmo tempo
+   * @returns {boolean} true se houver expediente ativo
+   */
+  temExpedienteAtivo() {
+    const db = storage.getDB();
+    return db.days.some((d) => d.status === "active");
+  },
+
+  /**
    * Cria um novo expediente com o estoque inicial do dia
+   * Usa timestamp completo no ID para garantir unicidade
    * @param {Object} form - Valores do formulário com quantidades iniciais
-   * @returns {Object} Novo expediente criado
+   * @returns {Object|null} Novo expediente ou null se já houver ativo
    */
   criar(form) {
+    // 🔥 bloqueia se já houver expediente ativo
+    if (this.temExpedienteAtivo()) return null;
+
     const hoje = new Date().toISOString().split("T")[0];
     const isSunday = new Date().getDay() === 0;
     const timestamp = Date.now();
 
     const novoExpediente = {
-      id: `${hoje}-${timestamp}`,
+      id: `${hoje}-${timestamp}`, // ID único com timestamp
       date: hoje,
       status: "active",
       isSunday,
+      iniciadoEm: timestamp,
       estoque: {
         frangosComRecheio: Number(form.comRecheio),
         frangosSemRecheio: Number(form.semRecheio),
@@ -42,13 +49,6 @@ export const expedienteService = {
     return novoExpediente;
   },
 
-  /**
-   * Calcula o total encomendado de um produto
-   * Soma todas as encomendas daquele produto no expediente
-   * @param {Object} expediente - Expediente atual
-   * @param {string} chave - Identificador do produto (ex: 'frangosComRecheio')
-   * @returns {number} Total encomendado
-   */
   getTotalEncomendado(expediente, chave) {
     return (expediente.pedidos || []).reduce((total, pedido) => {
       const item = (pedido.itens || []).find((i) => i.chave === chave);
@@ -56,13 +56,6 @@ export const expedienteService = {
     }, 0);
   },
 
-  /**
-   * Calcula o total vendido de um produto
-   * Soma todas as vendas daquele produto no expediente
-   * @param {Object} expediente - Expediente atual
-   * @param {string} chave - Identificador do produto
-   * @returns {number} Total vendido
-   */
   getTotalVendido(expediente, chave) {
     return (expediente.vendas || []).reduce((total, venda) => {
       const item = (venda.itens || []).find((i) => i.chave === chave);
@@ -70,13 +63,6 @@ export const expedienteService = {
     }, 0);
   },
 
-  /**
-   * Calcula a quantidade disponível de um produto
-   * Fórmula: Estoque Original - Encomendas - Vendas
-   * @param {Object} expediente - Expediente atual
-   * @param {string} chave - Identificador do produto
-   * @returns {number} Quantidade disponível
-   */
   getDisponivel(expediente, chave) {
     const original    = expediente.estoque[chave] || 0;
     const encomendado = this.getTotalEncomendado(expediente, chave);
@@ -84,13 +70,16 @@ export const expedienteService = {
     return original - encomendado - vendido;
   },
 
-  /**
-   * Marca um pedido como retirado pelo cliente
-   * Atualiza a flag 'retirado' do pedido para true
-   * @param {Object} expediente - Expediente atual
-   * @param {number} pedidoId - ID do pedido a ser marcado
-   * @returns {Object} Expediente atualizado
-   */
+  getTempoAtivo(expediente) {
+    if (!expediente.iniciadoEm) return "—";
+    const ms = Date.now() - expediente.iniciadoEm;
+    const totalMin = Math.floor(ms / 60000);
+    const horas = Math.floor(totalMin / 60);
+    const min = totalMin % 60;
+    const pad = (n) => String(n).padStart(2, "0");
+    return horas > 0 ? `${horas}h ${pad(min)}min` : `${pad(min)}min`;
+  },
+
   marcarRetirado(expediente, pedidoId) {
     const atualizado = {
       ...expediente,
@@ -98,62 +87,43 @@ export const expedienteService = {
         p.id === pedidoId ? { ...p, retirado: true } : p
       ),
     };
-
     storage.salvarExpedienteAtual(atualizado);
     storage.atualizarExpedienteNoDB(atualizado);
     return atualizado;
   },
 
-  /**
-   * Adiciona uma encomenda ao expediente
-   * NÃO desconta do estoque — apenas registra o pedido
-   * O disponível é calculado dinamicamente via getDisponivel()
-   * @param {Object} expediente - Expediente atual
-   * @param {Object} dados - { nome, telefone, itens }
-   * @returns {Object} Expediente atualizado
-   */
+  encerrar(expediente) {
+    const atualizado = {
+      ...expediente,
+      status: "closed",
+      encerradoEm: Date.now(),
+    };
+    storage.salvarExpedienteAtual(atualizado);
+    storage.atualizarExpedienteNoDB(atualizado);
+    return atualizado;
+  },
+
   adicionarEncomenda(expediente, { nome, telefone, itens }) {
     const atualizado = {
       ...expediente,
       pedidos: [
         ...expediente.pedidos,
-        {
-          id: Date.now(),
-          tipo: "encomenda",
-          nome,
-          telefone,
-          itens,
-          retirado: false, // começa sempre como pendente
-        },
+        { id: Date.now(), tipo: "encomenda", nome, telefone, itens, retirado: false },
       ],
     };
-
     storage.salvarExpedienteAtual(atualizado);
     storage.atualizarExpedienteNoDB(atualizado);
     return atualizado;
   },
 
-  /**
-   * Registra uma venda rápida no expediente
-   * NÃO desconta do estoque — apenas registra a venda
-   * O disponível é calculado dinamicamente via getDisponivel()
-   * @param {Object} expediente - Expediente atual
-   * @param {Object} dados - { itens }
-   * @returns {Object} Expediente atualizado
-   */
   adicionarVenda(expediente, { itens }) {
     const atualizado = {
       ...expediente,
       vendas: [
         ...expediente.vendas,
-        {
-          id: Date.now(),
-          tipo: "venda",
-          itens,
-        },
+        { id: Date.now(), tipo: "venda", itens },
       ],
     };
-
     storage.salvarExpedienteAtual(atualizado);
     storage.atualizarExpedienteNoDB(atualizado);
     return atualizado;
