@@ -13,6 +13,8 @@ import Config from './screens/Config';
 import Header from './components/Header/Header';
 import { HeaderMain } from './components/Header/HeaderMain';
 
+
+
 function LayoutHandler() {
   const location = useLocation();
   const isHome   = location.pathname === "/";
@@ -44,6 +46,7 @@ function App() {
         </div>
       </ToastProvider>
     </Router>
+    
   );
 }
 

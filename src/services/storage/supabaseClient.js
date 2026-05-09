@@ -1,28 +1,17 @@
-/**
- * Cliente Supabase configurado com as variáveis de ambiente
- * Exporta instância única reutilizada em todo o app
- */
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.warn("⚠️ Supabase não configurado — funcionando só offline");
-}
-
 /**
- * Cliente Supabase — null se não configurado
- * Todos os serviços checam se é null antes de usar
+ * Cliente Supabase com credenciais fixas
+ * App interno — credenciais embutidas para funcionar sem .env
  */
-export const supabase = SUPABASE_URL && SUPABASE_KEY
-  ? createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
+const SUPABASE_URL = "https://jbhqtzbtzzalypkqtkek.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpiaHF0emJ0enphbHlwa3F0a2VrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNjExMjQsImV4cCI6MjA5MzgzNzEyNH0.uAH0JkQpnhjovx2j2eYPTf6aHxqJ4LoSirfN5XnO-cM";
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 /**
- * Verifica se o Supabase está configurado e acessível
- * @returns {boolean}
+ * Sempre ativo — credenciais fixas no código
  */
 export function supabaseAtivo() {
-  return supabase !== null;
+  return true;
 }
