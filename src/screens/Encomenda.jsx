@@ -71,16 +71,19 @@ export default function Encomenda() {
     costela: 0,
   });
 
-  if (!expediente) return null;
-
-  const { isSunday } = expediente;
-
   // Simplificar: usar useMemo para calcular produtos visíveis
+  // IMPORTANTE: Hooks DEVEM estar antes de qualquer return condicional
   const produtosVisiveis = useMemo(() => {
+    if (!expediente) return [];
+    const { isSunday } = expediente;
     if (isSunday) return PRODUTOS[filtroAtivo] || [];
     // Se não for domingo, mostra apenas frangos
     return filtroAtivo === "frangos" ? PRODUTOS.frangos : [];
-  }, [isSunday, filtroAtivo]);
+  }, [expediente, filtroAtivo]);
+
+  if (!expediente) return null;
+
+  const { isSunday } = expediente;
 
   const handleSubmit = () => {
     const itens = Object.entries(qtds)
