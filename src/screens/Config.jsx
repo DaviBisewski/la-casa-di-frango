@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "../contexts/ToastContext";
 import {
   exportarJSON,
@@ -15,12 +15,18 @@ import {
 } from "../services/storage/syncService";
 import { supabaseAtivo } from "../services/storage/supabaseClient";
 
-import exportarIcon from "../assets/icons/exportar.svg";
-import importarIcon from "../assets/icons/importar.svg";
+import { StatusConexao }    from "../components/Layout/StatusConexao";
+import { CardComoSincronizar } from "../components/Cards/CardComoSincronizar";
+import { MetadadosBackup }  from "../components/Layout/MetadadosBackup";
+import { SecaoNuvem }       from "../components/Layout/SecaoNuvem";
+import { SecaoBackupLocal } from "../components/Layout/SecaoBackupLocal";
 
+/**
+ * Tela de configurações
+ * Orquestra backup local, sync com Supabase e status de conexão
+ */
 export default function Config() {
-  const { mostrar }  = useToast();
-  const inputRef     = useRef(null);
+  const { mostrar } = useToast();
 
   const [loading, setLoading]           = useState(false);
   const [syncLoading, setSyncLoading]   = useState(false);
@@ -42,7 +48,6 @@ export default function Config() {
     }
     carregar();
 
-    // monitora conexão
     const onOnline  = () => setOnline(true);
     const onOffline = () => setOnline(false);
     window.addEventListener("online",  onOnline);
@@ -53,20 +58,11 @@ export default function Config() {
     };
   }, []);
 
-  function formatarTS(ts) {
-    if (!ts) return "Nunca";
-    const date = typeof ts === "string" ? new Date(ts) : ts;
-    return new Intl.DateTimeFormat("pt-BR", {
-      day: "2-digit", month: "2-digit", year: "numeric",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
-    }).format(date);
-  }
-
   async function handleExportar() {
     try {
       await exportarJSON();
       setUltimoBackup(getUltimoBackupTimestamp());
-      mostrar("Backup exportado com sucesso! 📦", "sucesso");
+      mostrar("Backup exportado com sucesso!", "sucesso");
     } catch {
       mostrar("Erro ao exportar backup", "erro");
     }
@@ -83,7 +79,7 @@ export default function Config() {
     } else {
       const todos = await getTodosExpedientesIDB();
       setTotalDias(todos.length);
-      mostrar(`${importados} expedientes importados! ✅`, "sucesso");
+      mostrar(`${importados} expedientes importados!`, "sucesso");
     }
     e.target.value = "";
   }
@@ -95,9 +91,9 @@ export default function Config() {
     setUltimoSync(await getUltimoSync());
     setPendentes(getPendenteCount());
     setSyncLoading(false);
-    if (erros > 0) mostrar(`${erros} erro(s) ao sincronizar`, "erro");
-    else if (sincronizados > 0) mostrar(`${sincronizados} expediente(s) sincronizados ☁️`, "sucesso");
-    else mostrar("Tudo já estava sincronizado ✅", "info");
+    if (erros > 0)          mostrar(`${erros} erro(s) ao sincronizar`, "erro");
+    else if (sincronizados > 0) mostrar(`${sincronizados} expediente(s) sincronizados`, "sucesso");
+    else                    mostrar("Tudo já estava sincronizado", "info");
   }
 
   async function handleSyncBaixar() {
@@ -105,113 +101,44 @@ export default function Config() {
     setSyncLoading(true);
     const { importados, erro } = await baixarDoSupabase();
     setSyncLoading(false);
-    if (erro) mostrar(erro, "erro");
-    else {
+    if (erro) {
+      mostrar(erro, "erro");
+    } else {
       const todos = await getTodosExpedientesIDB();
       setTotalDias(todos.length);
-      mostrar(`${importados} expedientes baixados da nuvem ☁️`, "sucesso");
+      mostrar(`${importados} expedientes baixados da nuvem`, "sucesso");
     }
   }
 
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16 space-y-10">
 
-      {/* Status de conexão */}
-      <div className={`flex items-center gap-4 px-8 py-5 rounded-2xl text-2xl font-semibold
-        ${online ? "bg-[#D4F1E6] text-[#0F4C3A]" : "bg-red-50 text-red-700"}`}>
-        <div className={`w-4 h-4 rounded-full ${online ? "bg-[#0F4C3A]" : "bg-red-500"} animate-pulse`} />
-        {online ? "Conectado à internet" : "Sem conexão — dados salvos localmente"}
-      </div>
+      <StatusConexao online={online} />
 
-      {/* Card informativo */}
-      <div className="bg-[#D4F1E6] rounded-2xl p-10">
-        <p className="text-[#0F4C3A] text-2xl font-extrabold mb-6">
-          Como sincronizar:
-        </p>
-        <div className="space-y-3">
-          {["1 - Exporte o backup", "2 - Envie para outro dispositivo", "3 - Importe aqui"].map((l) => (
-            <p key={l} className="text-[#0F4C3A] text-2xl font-medium">{l}</p>
-          ))}
-        </div>
-      </div>
+      <CardComoSincronizar />
 
-      {/* Metadados */}
-      <div className="space-y-2">
-        <p className="text-[#0F4C3A]/60 text-2xl font-medium">
-          Último backup local: {formatarTS(ultimoBackup)}
-          {totalDias > 0 && <span> • Total: {totalDias} {totalDias === 1 ? "dia" : "dias"}</span>}
-        </p>
-        {supabaseAtivo() && (
-          <p className="text-[#0F4C3A]/60 text-2xl font-medium">
-            Último sync na nuvem: {formatarTS(ultimoSync)}
-            {pendentes > 0 && (
-              <span className="text-amber-600 font-bold"> • {pendentes} pendente(s)</span>
-            )}
-          </p>
-        )}
-      </div>
+      <MetadadosBackup
+        ultimoBackup={ultimoBackup}
+        ultimoSync={ultimoSync}
+        totalDias={totalDias}
+        pendentes={pendentes}
+        supabaseAtivo={supabaseAtivo()}
+      />
 
-      {/* Sync Supabase — só aparece se configurado */}
       {supabaseAtivo() && (
-        <div className="space-y-4">
-          <h3 className="text-[#0F4C3A] text-3xl font-extrabold">Nuvem</h3>
-
-          <button
-            onClick={handleSyncEnviar}
-            disabled={syncLoading || !online}
-            className="w-full flex items-center justify-center gap-6
-                       bg-[#0F4C3A] text-white text-3xl font-bold
-                       py-10 rounded-2xl hover:bg-[#0a3528]
-                       active:scale-[0.99] transition-all shadow-lg
-                       disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ☁️ {syncLoading ? "Sincronizando..." : "Enviar para nuvem"}
-          </button>
-
-          <button
-            onClick={handleSyncBaixar}
-            disabled={syncLoading || !online}
-            className="w-full flex items-center justify-center gap-6
-                       border-2 border-[#0F4C3A]/20 text-[#0F4C3A] text-3xl font-bold
-                       py-10 rounded-2xl hover:bg-[#0F4C3A]/5
-                       active:scale-[0.99] transition-all
-                       disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            ⬇️ {syncLoading ? "Baixando..." : "Baixar da nuvem"}
-          </button>
-        </div>
+        <SecaoNuvem
+          online={online}
+          loading={syncLoading}
+          onEnviar={handleSyncEnviar}
+          onBaixar={handleSyncBaixar}
+        />
       )}
 
-      {/* Backup local */}
-      <div className="space-y-4">
-        <h3 className="text-[#0F4C3A] text-3xl font-extrabold">Backup local</h3>
-
-        <button
-          onClick={handleExportar}
-          className="w-full flex items-center justify-center gap-8
-                     bg-[#0F4C3A] text-white text-4xl font-bold
-                     py-12 rounded-2xl hover:bg-[#0a3528]
-                     active:scale-[0.99] transition-all shadow-lg"
-        >
-          <img src={exportarIcon} alt="Exportar" className="w-14 h-14 brightness-0 invert" />
-          Exportar
-        </button>
-
-        <button
-          onClick={() => inputRef.current?.click()}
-          disabled={loading}
-          className="w-full flex items-center justify-center gap-8
-                     border-2 border-[#0F4C3A]/20 text-[#0F4C3A] text-4xl font-bold
-                     py-12 rounded-2xl hover:bg-[#0F4C3A]/5
-                     active:scale-[0.99] transition-all
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <img src={importarIcon} alt="Importar" className="w-14 h-14" />
-          {loading ? "Importando..." : "Importar"}
-        </button>
-
-        <input ref={inputRef} type="file" accept=".json" onChange={handleImportar} className="hidden" />
-      </div>
+      <SecaoBackupLocal
+        loading={loading}
+        onExportar={handleExportar}
+        onImportar={handleImportar}
+      />
 
     </div>
   );
