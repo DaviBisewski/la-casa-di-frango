@@ -35,20 +35,55 @@ const PRODUTOS = {
   ],
 };
 
-function CampoTexto({ label, placeholder, value, onChange, type = "text" }) {
+function CampoTexto({
+  label,
+  placeholder,
+  value,
+  onChange,
+  type = "text",
+}) {
   return (
-    <div className="flex flex-col gap-4 mb-12 w-full">
-      <label className="text-[#0F4C3A] text-4xl font-semibold">
+    <div className="flex flex-col gap-2 sm:gap-3 mb-6 sm:mb-10 w-full">
+
+      {/* Label */}
+      <label
+        className="
+          text-[#0F4C3A]
+          text-lg sm:text-2xl lg:text-3xl
+          font-semibold
+          leading-tight
+        "
+      >
         {label}
       </label>
+
+      {/* Input */}
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#D4F1E6] text-[#0F4C3A] text-3xl p-10 rounded-2xl
-                   placeholder:text-[#0F4C3A]/40 border-2 border-transparent
-                   focus:border-[#0F4C3A]/20 outline-none transition-all shadow-inner"
+        className="
+          w-full
+          bg-[#D4F1E6]
+          text-[#0F4C3A]
+
+          text-base sm:text-xl lg:text-2xl
+
+          px-4 py-4
+          sm:px-6 sm:py-5
+          lg:px-8 lg:py-6
+
+          rounded-2xl
+
+          placeholder:text-[#0F4C3A]/40
+
+          border-2 border-transparent
+          focus:border-[#0F4C3A]/20
+          outline-none
+          transition-all
+          shadow-inner
+        "
       />
     </div>
   );
