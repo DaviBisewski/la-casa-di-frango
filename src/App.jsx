@@ -10,7 +10,7 @@ import Encomenda from './screens/Encomenda';
 import Venda from './screens/Venda';
 import ExpedienteHistorico from './screens/ExpedienteHistorico';
 import Config from './screens/Config';
-import Header from './components/Header/Header';
+import Header from './components/Header/header';
 import HeaderMain  from './components/Header/HeaderMain';
 
 
