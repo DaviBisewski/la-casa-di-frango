@@ -70,10 +70,10 @@ export function ListaEncomendas({ pedidos, onRetirar }) {
   const restantes = filtrados.length - LIMITE_INICIAL;
 
   return (
-    <div className="mt-20">
+    <div className="mt-10 sm:mt-20">
 
       {/* Título */}
-      <h3 className="text-[#0F4C3A] text-5xl font-extrabold mb-15">
+      <h3 className="text-[#0F4C3A] text-2xl sm:text-5xl font-extrabold mb-8 sm:mb-15">
         Lista de Encomendas
       </h3>
 
@@ -92,13 +92,13 @@ export function ListaEncomendas({ pedidos, onRetirar }) {
         }}
       >
         {visiveis.length === 0 ? (
-          <p className="text-[#0F4C3A]/40 text-3xl text-center py-20">
+          <p className="text-[#0F4C3A]/40 text-lg sm:text-3xl text-center py-10 sm:py-20">
             {aba === "pendentes"
               ? "Nenhuma encomenda pendente"
               : "Nenhuma encomenda retirada"}
           </p>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-4 sm:space-y-8">
             {visiveis.map((pedido) => (
               <EncomendaCard
                 key={pedido.id}
@@ -114,8 +114,8 @@ export function ListaEncomendas({ pedidos, onRetirar }) {
         {!verTodos && restantes > 0 && (
           <button
             onClick={() => setVerTodos(true)}
-            className="w-full mt-10 py-9 rounded-full border-2 border-[#0F4C3A]
-                       text-[#0F4C3A] text-3xl font-bold
+            className="w-full mt-6 sm:mt-10 py-5 sm:py-9 rounded-full border-2 border-[#0F4C3A]
+                       text-[#0F4C3A] text-lg sm:text-3xl font-bold
                        hover:border-[#0F4C3A]/60 hover:bg-[#0F4C3A]/5
                        transition-all duration-200"
           >

@@ -76,54 +76,67 @@ export default function Venda() {
     navigate("/dashboard");
   };
 
-  return (
-    <div className="max-w-[1400px] mx-auto px-12 py-16">
+ /* ========================= VENDA RESPONSIVO ========================= */
 
-      {/* Título */}
-      <div className="flex items-center gap-4 mb-4">
-        <img src={vendaIcon} alt="Venda" className="w-12 h-12" />
-        <h2 className="text-[#0F4C3A] text-5xl font-extrabold">
-          Venda Rápida
-        </h2>
-      </div>
+return (
+  <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-16">
 
-      <p className="text-[#0F4C3A]/60 text-3xl font-medium mb-16 capitalize">
-        Hoje é {new Intl.DateTimeFormat('pt-BR', {
-          weekday: 'long', day: 'numeric', month: 'long'
-        }).format(new Date())}
-      </p>
+    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
 
-      {/* Filtros — só domingo */}
-      {isSunday && (
-        <div className="mb-8">
-          <EstoqueFiltros
-            filtros={FILTROS}
-            filtroAtivo={filtroAtivo}
-            onChange={setFiltroAtivo}
-          />
-        </div>
-      )}
+      <img
+        src={vendaIcon}
+        alt="Venda"
+        className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12"
+      />
 
-      {/* Produtos de forma genérica */}
-      {produtosVisiveis.length > 0 && (
-        <div className="mb-16">
-          {produtosVisiveis.map((produto) => (
-            <ProdutoLinha
-              key={produto.chave}
-              icone={produto.icone}
-              titulo={produto.titulo}
-              quantidade={qtds[produto.chave]}
-              onChange={(valor) => setQtds((prev) => ({ ...prev, [produto.chave]: valor }))}
-              max={expedienteService.getDisponivel(expediente, produto.chave)}
-            />
-          ))}
-        </div>
-      )}
-
-      <ButtonConfirm onClick={handleSubmit}>
-        Adicionar Venda
-      </ButtonConfirm>
-
+      <h2 className="text-[#0F4C3A] text-2xl sm:text-4xl lg:text-5xl font-extrabold">
+        Venda Rápida
+      </h2>
     </div>
-  );
+
+    <p className="text-[#0F4C3A]/60 text-base sm:text-2xl lg:text-3xl font-medium mb-8 sm:mb-12 lg:mb-16 capitalize">
+      Hoje é{" "}
+      {new Intl.DateTimeFormat("pt-BR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      }).format(new Date())}
+    </p>
+
+    {isSunday && (
+      <div className="mb-6 sm:mb-8">
+        <EstoqueFiltros
+          filtros={FILTROS}
+          filtroAtivo={filtroAtivo}
+          onChange={setFiltroAtivo}
+        />
+      </div>
+    )}
+
+    {produtosVisiveis.length > 0 && (
+      <div className="mb-10 sm:mb-14 lg:mb-16">
+        {produtosVisiveis.map((produto) => (
+          <ProdutoLinha
+            key={produto.chave}
+            icone={produto.icone}
+            titulo={produto.titulo}
+            quantidade={qtds[produto.chave]}
+            onChange={(valor) =>
+              setQtds((prev) => ({
+                ...prev,
+                [produto.chave]: valor,
+              }))
+            }
+            max={expedienteService.getDisponivel(expediente, produto.chave)}
+          />
+        ))}
+      </div>
+    )}
+
+    <ButtonConfirm onClick={handleSubmit}>
+      Adicionar Venda
+    </ButtonConfirm>
+
+  </div>
+);
 }

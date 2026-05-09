@@ -46,65 +46,97 @@ export default function Dashboard() {
     navigate("/");
   }
 
-  return (
-    <div className="max-w-[1400px] mx-auto px-12 py-16">
+/* ========================= DASHBOARD RESPONSIVO ========================= */
 
-      <div className="flex items-center justify-between mb-15">
-        <div className="flex items-center gap-5">
-          <img src={estoqueIcon} alt="Estoque" className="w-14 h-14" />
-          <h2 className="text-[#0F4C3A] text-5xl font-extrabold">Estoque</h2>
-        </div>
-        <span className="flex items-center gap-6 bg-[#0F4C3A] text-white
-                         text-3xl font-semibold px-13 py-5 rounded-full">
-          <img
-            src={isAtivo ? ativoIcon : encerradoIcon}
-            alt={isAtivo ? "Ativo" : "Encerrado"}
-            className="w-10 h-10 brightness-0 invert"
-          />
-          {isAtivo ? "Ativo" : "Encerrado"}
-        </span>
+return (
+  <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-16">
+
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-12 lg:mb-15">
+
+      <div className="flex items-center gap-3 sm:gap-5">
+        <img
+          src={estoqueIcon}
+          alt="Estoque"
+          className="w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14"
+        />
+
+        <h2 className="text-[#0F4C3A] text-2xl sm:text-4xl lg:text-5xl font-extrabold">
+          Estoque
+        </h2>
       </div>
 
-      {isSunday && (
-        <EstoqueFiltros
-          filtros={FILTROS}
-          filtroAtivo={filtroAtivo}
-          onChange={setFiltroAtivo}
+      <span
+        className="flex items-center justify-center gap-3 bg-[#0F4C3A]
+                   text-white text-sm sm:text-xl lg:text-3xl font-semibold
+                   px-5 sm:px-8 lg:px-13 py-3 sm:py-4 lg:py-5 rounded-full w-fit"
+      >
+        <img
+          src={isAtivo ? ativoIcon : encerradoIcon}
+          alt={isAtivo ? "Ativo" : "Encerrado"}
+          className="w-4 h-4 sm:w-6 sm:h-6 lg:w-10 lg:h-10 brightness-0 invert"
         />
-      )}
 
-      {(!isSunday || filtroAtivo === "frangos") && (
-        <EstoqueCarrossel items={itemsFrangos} expediente={expediente} />
-      )}
-
-      {isSunday && filtroAtivo === "maioneses" && (
-        <div className="grid grid-cols-2 gap-6">
-          <EstoqueCard titulo="Maionese R$10,00" icone={maioneseIcon} expediente={expediente} chave="maionese10" fullWidth />
-          <EstoqueCard titulo="Maionese R$15,00" icone={maioneseIcon} expediente={expediente} chave="maionese15" fullWidth />
-        </div>
-      )}
-
-      {isSunday && filtroAtivo === "costela" && (
-        <EstoqueCard titulo="Costela" icone={costelaIcon} expediente={expediente} chave="costela" fullWidth />
-      )}
-
-      {isAtivo && <BotoesAcao />}
-
-      {(expediente.pedidos || []).length > 0 && (
-        <ListaEncomendas
-          pedidos={expediente.pedidos}
-          onRetirar={marcarRetirado}
-        />
-      )}
-
-      {/* Botão encerrar — só aparece quando ativo */}
-      {isAtivo && (
-        <BotaoEncerrar
-          expediente={expediente}
-          onEncerrar={handleEncerrar}
-        />
-      )}
-
+        {isAtivo ? "Ativo" : "Encerrado"}
+      </span>
     </div>
-  );
+
+    {isSunday && (
+      <EstoqueFiltros
+        filtros={FILTROS}
+        filtroAtivo={filtroAtivo}
+        onChange={setFiltroAtivo}
+      />
+    )}
+
+    {(!isSunday || filtroAtivo === "frangos") && (
+      <EstoqueCarrossel items={itemsFrangos} expediente={expediente} />
+    )}
+
+    {isSunday && filtroAtivo === "maioneses" && (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <EstoqueCard
+          titulo="Maionese R$10,00"
+          icone={maioneseIcon}
+          expediente={expediente}
+          chave="maionese10"
+          fullWidth
+        />
+
+        <EstoqueCard
+          titulo="Maionese R$15,00"
+          icone={maioneseIcon}
+          expediente={expediente}
+          chave="maionese15"
+          fullWidth
+        />
+      </div>
+    )}
+
+    {isSunday && filtroAtivo === "costela" && (
+      <EstoqueCard
+        titulo="Costela"
+        icone={costelaIcon}
+        expediente={expediente}
+        chave="costela"
+        fullWidth
+      />
+    )}
+
+    {isAtivo && <BotoesAcao />}
+
+    {(expediente.pedidos || []).length > 0 && (
+      <ListaEncomendas
+        pedidos={expediente.pedidos}
+        onRetirar={marcarRetirado}
+      />
+    )}
+
+    {isAtivo && (
+      <BotaoEncerrar
+        expediente={expediente}
+        onEncerrar={handleEncerrar}
+      />
+    )}
+  </div>
+);
 }

@@ -14,7 +14,7 @@ export function MetadadosBackup({ ultimoBackup, ultimoSync, totalDias, pendentes
 
   return (
     <div className="space-y-2">
-      <p className="text-[#0F4C3A]/60 text-2xl font-medium">
+      <p className="text-[#0F4C3A]/60 text-sm sm:text-2xl font-medium break-words">
         Último backup local: {formatarTS(ultimoBackup)}
         {totalDias > 0 && (
           <span> • Total: {totalDias} {totalDias === 1 ? "dia" : "dias"}</span>
@@ -22,7 +22,7 @@ export function MetadadosBackup({ ultimoBackup, ultimoSync, totalDias, pendentes
       </p>
 
       {supabaseAtivo && (
-        <p className="text-[#0F4C3A]/60 text-2xl font-medium">
+        <p className="text-[#0F4C3A]/60 text-sm sm:text-2xl font-medium break-words">
           Último sync na nuvem: {formatarTS(ultimoSync)}
           {pendentes > 0 && (
             <span className="text-amber-600 font-bold"> • {pendentes} pendente(s)</span>

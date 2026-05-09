@@ -11,22 +11,23 @@ const Header = () => {
   const navigate = useNavigate();
 
   return (
-    <header className="w-full bg-[#0F4C3A] py-15 px-10 shadow-md">
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between">
+    <header className="w-full bg-[#0F4C3A] py-5 sm:py-15 px-4 sm:px-10 shadow-md">
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between gap-4">
 
         {/* Lado Esquerdo: Logo e Nome da Marca — clica para ir à home */}
         <button
           onClick={() => navigate("/")}
-          className="flex items-center gap-6 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 sm:gap-6 hover:opacity-80 transition-opacity min-w-0"
         >
           <div className="flex-shrink-0">
             <img
               src={logo}
               alt="Logo La Casa Di Frango"
-              className="w-28 h-28 object-contain"
+              className="w-14 h-14 sm:w-28 sm:h-28 object-contain"
             />
           </div>
-          <h1 className="text-white text-5xl font-extrabold">
+
+          <h1 className="text-white text-2xl sm:text-5xl font-extrabold truncate">
             La Casa Di Frango
           </h1>
         </button>
@@ -34,14 +35,14 @@ const Header = () => {
         {/* Lado Direito: Ícone de Configurações — navega para /config */}
         <button
           onClick={() => navigate("/config")}
-          className="p-4 rounded-full hover:bg-white/10
-                     active:scale-95 transition-all"
+          className="p-2 sm:p-4 rounded-full hover:bg-white/10
+                     active:scale-95 transition-all flex-shrink-0"
           aria-label="Configurações"
         >
           <img
             src={gearIcon}
             alt="Configurações"
-            className="w-20 h-20 brightness-0 invert"
+            className="w-8 h-8 sm:w-20 sm:h-20 brightness-0 invert"
           />
         </button>
 

@@ -75,69 +75,83 @@ export default function Home() {
     }
   }
 
-  return (
-    <div className="max-w-[1400px] mx-auto">
+ /* ========================= HOME RESPONSIVO ========================= */
 
-      <StartShift onStart={() => navigate("/estoque")} />
+return (
+  <div className="max-w-[1400px] mx-auto">
 
-      {/* Loading */}
-      {carregando && (
-        <div className="flex items-center justify-center py-20">
-          <div className="w-12 h-12 rounded-full border-4 border-[#0F4C3A]/20
-                          border-t-[#0F4C3A] animate-spin" />
+    <StartShift onStart={() => navigate("/estoque")} />
+
+    {carregando && (
+      <div className="flex items-center justify-center py-14 sm:py-20">
+        <div
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full
+                     border-4 border-[#0F4C3A]/20
+                     border-t-[#0F4C3A] animate-spin"
+        />
+      </div>
+    )}
+
+    {!carregando && historico.length > 0 && (
+      <section className="px-4 sm:px-6 lg:px-12 mt-10 sm:mt-16 lg:mt-20 pb-16 sm:pb-20">
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8 sm:mb-10">
+
+          <h2
+            className="text-[#0F4C3A]
+                       text-2xl sm:text-3xl lg:text-4xl
+                       font-extrabold uppercase tracking-tight"
+          >
+            Histórico de Vendas
+          </h2>
+
+          <CalendarioFiltro
+            dataSelecionada={dataFiltro}
+            onSelecionar={handleFiltro}
+            onLimpar={() => {
+              setDataFiltro(null);
+              setVerTodos(false);
+            }}
+            datasComExpediente={datasComExpediente}
+          />
         </div>
-      )}
 
-      {/* Histórico */}
-      {!carregando && historico.length > 0 && (
-        <section className="px-12 mt-20 pb-20">
+        {historicoFiltrado.length === 0 ? (
+          <p className="text-[#0F4C3A]/40 text-lg sm:text-2xl text-center py-12 sm:py-16">
+            Nenhum expediente encontrado nessa data
+          </p>
+        ) : (
+          <>
+            <div className="space-y-4 sm:space-y-6">
+              {historicoVisivel.map((exp) => (
+                <HistoricoCard
+                  key={exp.id}
+                  expediente={exp}
+                  onClick={() => handleVerExpediente(exp)}
+                />
+              ))}
+            </div>
 
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-[#0F4C3A] text-4xl font-extrabold uppercase tracking-tight">
-              Histórico de Vendas
-            </h2>
-            <CalendarioFiltro
-              dataSelecionada={dataFiltro}
-              onSelecionar={handleFiltro}
-              onLimpar={() => { setDataFiltro(null); setVerTodos(false); }}
-              datasComExpediente={datasComExpediente}
-            />
-          </div>
-
-          {historicoFiltrado.length === 0 ? (
-            <p className="text-[#0F4C3A]/40 text-2xl text-center py-16">
-              Nenhum expediente encontrado nessa data
-            </p>
-          ) : (
-            <>
-              <div className="space-y-6">
-                {historicoVisivel.map((exp) => (
-                  <HistoricoCard
-                    key={exp.id}
-                    expediente={exp}
-                    onClick={() => handleVerExpediente(exp)}
-                  />
-                ))}
-              </div>
-
-              {/* Botão Ver mais — só aparece quando há itens ocultos */}
-              {!verTodos && restantes > 0 && (
-                <button
-                  onClick={() => setVerTodos(true)}
-                  className="w-full mt-8 py-9 rounded-4xl border-2 border-[#0F4C3A]
-                             text-[#0F4C3A] text-3xl font-bold
-                             hover:border-[#0F4C3A]/50 hover:bg-[#0F4C3A]/5
-                             active:scale-[0.99] transition-all"
-                >
-                  Ver + {restantes} {restantes === 1 ? "expediente" : "expedientes"}
-                </button>
-              )}
-            </>
-          )}
-
-        </section>
-      )}
-
-    </div>
-  );
+            {!verTodos && restantes > 0 && (
+              <button
+                onClick={() => setVerTodos(true)}
+                className="w-full mt-6 sm:mt-8
+                           py-5 sm:py-7 lg:py-9 rounded-3xl sm:rounded-4xl
+                           border-2 border-[#0F4C3A]
+                           text-[#0F4C3A]
+                           text-lg sm:text-2xl lg:text-3xl font-bold
+                           hover:border-[#0F4C3A]/50
+                           hover:bg-[#0F4C3A]/5
+                           active:scale-[0.99] transition-all"
+              >
+                Ver + {restantes}{" "}
+                {restantes === 1 ? "expediente" : "expedientes"}
+              </button>
+            )}
+          </>
+        )}
+      </section>
+    )}
+  </div>
+);
 }

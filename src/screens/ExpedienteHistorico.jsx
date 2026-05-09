@@ -35,68 +35,81 @@ export default function ExpedienteHistorico() {
     { titulo: "Meio Frango", icone: frangoIcon, chave: "meioFrango"        },
   ];
 
-  return (
-    <div className="max-w-[1400px] mx-auto px-12 py-16">
+  /* ========================= HISTORICO RESPONSIVO ========================= */
 
-      {/* Cabeçalho com status */}
-      <div className="flex items-center justify-between mb-12">
-        <div className="flex items-center gap-5">
-          <img src={estoqueIcon} alt="Estoque" className="w-14 h-14" />
-          <h2 className="text-[#0F4C3A] text-5xl font-extrabold">Estoque</h2>
-        </div>
+return (
+  <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-16">
 
-        <span className="flex items-center gap-4 bg-[#0F4C3A] text-white
-                         text-2xl font-semibold px-10 py-5 rounded-full">
-          <img
-            src={encerradoIcon}
-            alt="Encerrado"
-            className="w-8 h-8 brightness-0 invert"
-          />
-          Encerrado
-        </span>
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-12">
+
+      <div className="flex items-center gap-3 sm:gap-5">
+        <img
+          src={estoqueIcon}
+          alt="Estoque"
+          className="w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14"
+        />
+
+        <h2 className="text-[#0F4C3A] text-2xl sm:text-4xl lg:text-5xl font-extrabold">
+          Estoque
+        </h2>
       </div>
 
-      {/* Carrossel de frangos */}
-      <EstoqueCarrossel items={itemsFrangos} expediente={expediente} />
+      <span
+        className="flex items-center justify-center gap-3 bg-[#0F4C3A]
+                   text-white text-sm sm:text-lg lg:text-2xl font-semibold
+                   px-5 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 rounded-full w-fit"
+      >
+        <img
+          src={encerradoIcon}
+          alt="Encerrado"
+          className="w-4 h-4 sm:w-6 sm:h-6 lg:w-8 lg:h-8 brightness-0 invert"
+        />
 
-      {/* Cards de domingo se aplicável */}
-      {isSunday && (
-        <div className="mt-10 space-y-6">
-          <div className="grid grid-cols-2 gap-6">
-            <EstoqueCard
-              titulo="Maionese R$10,00"
-              icone={maioneseIcon}
-              expediente={expediente}
-              chave="maionese10"
-              fullWidth
-            />
-            <EstoqueCard
-              titulo="Maionese R$15,00"
-              icone={maioneseIcon}
-              expediente={expediente}
-              chave="maionese15"
-              fullWidth
-            />
-          </div>
+        Encerrado
+      </span>
+    </div>
+
+    <EstoqueCarrossel items={itemsFrangos} expediente={expediente} />
+
+    {isSunday && (
+      <div className="mt-6 sm:mt-10 space-y-4 sm:space-y-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <EstoqueCard
-            titulo="Costela"
-            icone={costelaIcon}
+            titulo="Maionese R$10,00"
+            icone={maioneseIcon}
             expediente={expediente}
-            chave="costela"
+            chave="maionese10"
+            fullWidth
+          />
+
+          <EstoqueCard
+            titulo="Maionese R$15,00"
+            icone={maioneseIcon}
+            expediente={expediente}
+            chave="maionese15"
             fullWidth
           />
         </div>
-      )}
 
-      {/* Lista de encomendas — mostra todas para visualização do histórico */}
-      {(expediente.pedidos || []).length > 0 && (
-        <ListaEncomendas
-          pedidos={expediente.pedidos}
-          onRetirar={() => {}} // somente leitura no histórico
-          somenteLeitura
+        <EstoqueCard
+          titulo="Costela"
+          icone={costelaIcon}
+          expediente={expediente}
+          chave="costela"
+          fullWidth
         />
-      )}
+      </div>
+    )}
 
-    </div>
-  );
+    {(expediente.pedidos || []).length > 0 && (
+      <ListaEncomendas
+        pedidos={expediente.pedidos}
+        onRetirar={() => {}}
+        somenteLeitura
+      />
+    )}
+
+  </div>
+);
 }

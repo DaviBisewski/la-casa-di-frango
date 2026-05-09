@@ -110,36 +110,37 @@ export default function Config() {
     }
   }
 
-  return (
-    <div className="max-w-[1400px] mx-auto px-12 py-16 space-y-10">
+  /* ========================= CONFIG RESPONSIVO ========================= */
 
-      <StatusConexao online={online} />
+return (
+  <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-16 space-y-6 sm:space-y-8 lg:space-y-10">
 
-      <CardComoSincronizar />
+    <StatusConexao online={online} />
 
-      <MetadadosBackup
-        ultimoBackup={ultimoBackup}
-        ultimoSync={ultimoSync}
-        totalDias={totalDias}
-        pendentes={pendentes}
-        supabaseAtivo={supabaseAtivo()}
+    <CardComoSincronizar />
+
+    <MetadadosBackup
+      ultimoBackup={ultimoBackup}
+      ultimoSync={ultimoSync}
+      totalDias={totalDias}
+      pendentes={pendentes}
+      supabaseAtivo={supabaseAtivo()}
+    />
+
+    {supabaseAtivo() && (
+      <SecaoNuvem
+        online={online}
+        loading={syncLoading}
+        onEnviar={handleSyncEnviar}
+        onBaixar={handleSyncBaixar}
       />
+    )}
 
-      {supabaseAtivo() && (
-        <SecaoNuvem
-          online={online}
-          loading={syncLoading}
-          onEnviar={handleSyncEnviar}
-          onBaixar={handleSyncBaixar}
-        />
-      )}
+    <SecaoBackupLocal
+      loading={loading}
+      onExportar={handleExportar}
+      onImportar={handleImportar}
+    />
 
-      <SecaoBackupLocal
-        loading={loading}
-        onExportar={handleExportar}
-        onImportar={handleImportar}
-      />
-
-    </div>
-  );
-}
+  </div>
+);}

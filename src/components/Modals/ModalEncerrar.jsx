@@ -31,33 +31,46 @@ export function ModalEncerrar({ expediente, onConfirmar, onCancelar }) {
       />
 
       {/* Modal centralizado */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-12">
+      <div className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-6 md:px-12">
         <div
-          className="bg-white rounded-3xl p-16 w-full max-w-[700px] shadow-2xl
+          className="bg-white rounded-2xl md:rounded-3xl
+                     p-6 sm:p-8 md:p-16
+                     w-full max-w-[700px] shadow-2xl
                      animate-scale-in"
         >
           {/* Tempo ativo */}
-          <div className="flex items-center gap-5 mb-6">
-            <img src={clockIcon} alt="Tempo" className="w-10 h-10 opacity-60" />
-            <span className="text-[#0F4C3A]/60 text-2xl font-semibold">
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-5 mb-5 md:mb-6">
+            <img
+              src={clockIcon}
+              alt="Tempo"
+              className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 opacity-60"
+            />
+            <span className="text-[#0F4C3A]/60 text-base sm:text-xl md:text-2xl font-semibold">
               Expediente ativo a {tempo}
             </span>
           </div>
 
           {/* Pergunta */}
-          <h2 className="text-[#0F4C3A] text-5xl font-extrabold mb-6 leading-tight">
+          <h2 className="text-[#0F4C3A]
+                         text-3xl sm:text-4xl md:text-5xl
+                         font-extrabold mb-4 md:mb-6 leading-tight">
             Encerrar expediente?
           </h2>
-          <p className="text-[#0F4C3A]/50 text-2xl mb-16">
+
+          <p className="text-[#0F4C3A]/50
+                        text-lg sm:text-xl md:text-2xl
+                        mb-10 md:mb-16 leading-relaxed">
             Essa ação não pode ser desfeita. O expediente será marcado como encerrado.
           </p>
 
           {/* Botões */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4 md:gap-5">
             <button
               onClick={onConfirmar}
-              className="w-full bg-[#0F4C3A] text-white text-3xl font-bold
-                         py-8 rounded-2xl hover:bg-[#0a3528]
+              className="w-full bg-[#0F4C3A]
+                         text-white text-xl sm:text-2xl md:text-3xl font-bold
+                         py-5 sm:py-6 md:py-8 rounded-2xl
+                         hover:bg-[#0a3528]
                          active:scale-[0.99] transition-all shadow-lg"
             >
               Encerrar Expediente
@@ -66,7 +79,8 @@ export function ModalEncerrar({ expediente, onConfirmar, onCancelar }) {
             <button
               onClick={onCancelar}
               className="w-full border-2 border-[#0F4C3A]/20 text-[#0F4C3A]
-                         text-3xl font-semibold py-8 rounded-2xl
+                         text-xl sm:text-2xl md:text-3xl font-semibold
+                         py-5 sm:py-6 md:py-8 rounded-2xl
                          hover:border-[#0F4C3A]/50 hover:bg-[#0F4C3A]/5
                          active:scale-[0.99] transition-all"
             >
