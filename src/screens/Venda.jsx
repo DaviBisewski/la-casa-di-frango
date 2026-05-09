@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
 import { useToast } from "../contexts/ToastContext";
@@ -19,6 +19,22 @@ const FILTROS = [
   { key: "costela",   label: "Costela",   icone: costelaIcon  },
 ];
 
+// Definição centralizada de produtos
+const PRODUTOS = {
+  frangos: [
+    { chave: "frangosSemRecheio", titulo: "Frango S/R", icone: frangoIcon },
+    { chave: "frangosComRecheio", titulo: "Frango C/R", icone: frangoIcon },
+    { chave: "meioFrango", titulo: "Meio Frango", icone: frangoIcon },
+  ],
+  maioneses: [
+    { chave: "maionese10", titulo: "Maionese R$10,00", icone: maioneseIcon },
+    { chave: "maionese15", titulo: "Maionese R$15,00", icone: maioneseIcon },
+  ],
+  costela: [
+    { chave: "costela", titulo: "Costela", icone: costelaIcon },
+  ],
+};
+
 export default function Venda() {
   const { expediente, adicionarVenda } = useExpediente();
   const { mostrar } = useToast();
@@ -38,15 +54,14 @@ export default function Venda() {
 
   const { isSunday } = expediente;
 
-  function disponivel(chave) {
-    return expedienteService.getDisponivel(expediente, chave);
-  }
+  // Simplificar: usar useMemo para calcular produtos visíveis
+  const produtosVisiveis = useMemo(() => {
+    if (isSunday) return PRODUTOS[filtroAtivo] || [];
+    // Se não for domingo, mostra apenas frangos
+    return filtroAtivo === "frangos" ? PRODUTOS.frangos : [];
+  }, [isSunday, filtroAtivo]);
 
-  function setQtd(chave, valor) {
-    setQtds((prev) => ({ ...prev, [chave]: valor }));
-  }
-
-  function handleSubmit() {
+  const handleSubmit = () => {
     const itens = Object.entries(qtds)
       .filter(([, quantidade]) => quantidade > 0)
       .map(([chave, quantidade]) => ({ chave, quantidade }));
@@ -56,7 +71,7 @@ export default function Venda() {
     adicionarVenda({ itens });
     mostrar(MENSAGENS.VENDA_REGISTRADA, "sucesso");
     navigate("/dashboard");
-  }
+  };
 
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
@@ -86,63 +101,19 @@ export default function Venda() {
         </div>
       )}
 
-      {/* Frangos */}
-      {(!isSunday || filtroAtivo === "frangos") && (
+      {/* Produtos de forma genérica */}
+      {produtosVisiveis.length > 0 && (
         <div className="mb-16">
-          <ProdutoLinha
-            icone={frangoIcon}
-            titulo="Frango S/R"
-            quantidade={qtds.frangosSemRecheio}
-            onChange={(v) => setQtd("frangosSemRecheio", v)}
-            max={disponivel("frangosSemRecheio")}
-          />
-          <ProdutoLinha
-            icone={frangoIcon}
-            titulo="Frango C/R"
-            quantidade={qtds.frangosComRecheio}
-            onChange={(v) => setQtd("frangosComRecheio", v)}
-            max={disponivel("frangosComRecheio")}
-          />
-          <ProdutoLinha
-            icone={frangoIcon}
-            titulo="Meio Frango"
-            quantidade={qtds.meioFrango}
-            onChange={(v) => setQtd("meioFrango", v)}
-            max={disponivel("meioFrango")}
-          />
-        </div>
-      )}
-
-      {/* Maioneses */}
-      {isSunday && filtroAtivo === "maioneses" && (
-        <div className="mb-16">
-          <ProdutoLinha
-            icone={maioneseIcon}
-            titulo="Maionese R$10,00"
-            quantidade={qtds.maionese10}
-            onChange={(v) => setQtd("maionese10", v)}
-            max={disponivel("maionese10")}
-          />
-          <ProdutoLinha
-            icone={maioneseIcon}
-            titulo="Maionese R$15,00"
-            quantidade={qtds.maionese15}
-            onChange={(v) => setQtd("maionese15", v)}
-            max={disponivel("maionese15")}
-          />
-        </div>
-      )}
-
-      {/* Costela */}
-      {isSunday && filtroAtivo === "costela" && (
-        <div className="mb-16">
-          <ProdutoLinha
-            icone={costelaIcon}
-            titulo="Costela"
-            quantidade={qtds.costela}
-            onChange={(v) => setQtd("costela", v)}
-            max={disponivel("costela")}
-          />
+          {produtosVisiveis.map((produto) => (
+            <ProdutoLinha
+              key={produto.chave}
+              icone={produto.icone}
+              titulo={produto.titulo}
+              quantidade={qtds[produto.chave]}
+              onChange={(valor) => setQtds((prev) => ({ ...prev, [produto.chave]: valor }))}
+              max={expedienteService.getDisponivel(expediente, produto.chave)}
+            />
+          ))}
         </div>
       )}
 

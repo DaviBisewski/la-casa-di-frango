@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useExpediente } from "../hooks/useExpediente";
 import { useToast } from "../contexts/ToastContext";
@@ -18,6 +18,22 @@ const FILTROS = [
   { key: "maioneses", label: "Maioneses", icone: maioneseIcon },
   { key: "costela",   label: "Costela",   icone: costelaIcon  },
 ];
+
+// Definição centralizada de produtos (mesmo em Venda.jsx)
+const PRODUTOS = {
+  frangos: [
+    { chave: "frangosSemRecheio", titulo: "Frango S/R", icone: frangoIcon },
+    { chave: "frangosComRecheio", titulo: "Frango C/R", icone: frangoIcon },
+    { chave: "meioFrango", titulo: "Meio Frango", icone: frangoIcon },
+  ],
+  maioneses: [
+    { chave: "maionese10", titulo: "Maionese R$10,00", icone: maioneseIcon },
+    { chave: "maionese15", titulo: "Maionese R$15,00", icone: maioneseIcon },
+  ],
+  costela: [
+    { chave: "costela", titulo: "Costela", icone: costelaIcon },
+  ],
+};
 
 function CampoTexto({ label, placeholder, value, onChange, type = "text" }) {
   return (
@@ -59,15 +75,14 @@ export default function Encomenda() {
 
   const { isSunday } = expediente;
 
-  function disponivel(chave) {
-    return expedienteService.getDisponivel(expediente, chave);
-  }
+  // Simplificar: usar useMemo para calcular produtos visíveis
+  const produtosVisiveis = useMemo(() => {
+    if (isSunday) return PRODUTOS[filtroAtivo] || [];
+    // Se não for domingo, mostra apenas frangos
+    return filtroAtivo === "frangos" ? PRODUTOS.frangos : [];
+  }, [isSunday, filtroAtivo]);
 
-  function setQtd(chave, valor) {
-    setQtds((prev) => ({ ...prev, [chave]: valor }));
-  }
-
-  function handleSubmit() {
+  const handleSubmit = () => {
     const itens = Object.entries(qtds)
       .filter(([, quantidade]) => quantidade > 0)
       .map(([chave, quantidade]) => ({ chave, quantidade }));
@@ -77,7 +92,7 @@ export default function Encomenda() {
     adicionarEncomenda({ nome, telefone, itens });
     mostrar(MENSAGENS.ENCOMENDA_ADICIONADA, "sucesso");
     navigate("/dashboard");
-  }
+  };
 
   return (
     <div className="max-w-[1400px] mx-auto px-12 py-16">
@@ -121,33 +136,24 @@ export default function Encomenda() {
         </div>
       )}
 
-      {(!isSunday || filtroAtivo === "frangos") && (
+      {/* Produtos de forma genérica */}
+      {produtosVisiveis.length > 0 && (
         <div className="mb-16">
-          <ProdutoLinha
-            icone={frangoIcon}
-            titulo="Frango S/R"
-            quantidade={qtds.frangosSemRecheio}
-            onChange={(v) => setQtd("frangosSemRecheio", v)}
-            max={disponivel("frangosSemRecheio")}
-          />
-          <ProdutoLinha
-            icone={frangoIcon}
-            titulo="Frango C/R"
-            quantidade={qtds.frangosComRecheio}
-            onChange={(v) => setQtd("frangosComRecheio", v)}
-            max={disponivel("frangosComRecheio")}
-          />
-          <ProdutoLinha
-            icone={frangoIcon}
-            titulo="Meio Frango"
-            quantidade={qtds.meioFrango}
-            onChange={(v) => setQtd("meioFrango", v)}
-            max={disponivel("meioFrango")}
-          />
+          {produtosVisiveis.map((produto) => (
+            <ProdutoLinha
+              key={produto.chave}
+              icone={produto.icone}
+              titulo={produto.titulo}
+              quantidade={qtds[produto.chave]}
+              onChange={(valor) => setQtds((prev) => ({ ...prev, [produto.chave]: valor }))}
+              max={expedienteService.getDisponivel(expediente, produto.chave)}
+            />
+          ))}
         </div>
       )}
 
-      {isSunday && filtroAtivo === "maioneses" && (
+      <ButtonConfirm onClick={handleSubmit}>
+        Adicionar Encomenda
         <div className="mb-16">
           <ProdutoLinha
             icone={maioneseIcon}
