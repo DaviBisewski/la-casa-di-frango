@@ -11,7 +11,7 @@ import Venda from './screens/Venda';
 import ExpedienteHistorico from './screens/ExpedienteHistorico';
 import Config from './screens/Config';
 import Header from './components/Header/header';
-import HeaderMain  from './components/Header/HeaderMain';
+import {HeaderMain}  from './components/Header/HeaderMain';
 
 
 
