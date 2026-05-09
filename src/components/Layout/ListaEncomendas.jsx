@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { BuscaEncomenda } from "../Layout/BuscaEncomenda";
 import { FiltroAba } from "../Layout/FiltroAba";
 import { EncomendaCard } from "../Cards/EncomendaCard";
@@ -31,12 +31,14 @@ export function ListaEncomendas({ pedidos, onRetirar }) {
     }, 220);
   }
 
-  function trocarAba(nova) {
+  // useCallback para evitar recriação da função a cada render
+  // Importante porque é passada como prop para FiltroAba
+  const trocarAba = useCallback((nova) => {
     animarTroca(() => {
       setAba(nova);
       setVerTodos(false);
     });
-  }
+  }, []);
 
   /** Anima ao digitar na busca também */
   useEffect(() => {
@@ -45,17 +47,26 @@ export function ListaEncomendas({ pedidos, onRetirar }) {
     timeoutRef.current = setTimeout(() => setVisivel(true), 180);
   }, [busca]);
 
-  const filtrados = pedidos
-    .filter((p) => aba === "pendentes" ? !p.retirado : p.retirado)
-    .filter((p) => {
-      const texto = busca.toLowerCase();
-      return (
-        p.nome?.toLowerCase().includes(texto) ||
-        p.telefone?.toLowerCase().includes(texto)
-      );
-    });
+  // useMemo para evitar recalcular filtrados a cada render
+  // Depende de pedidos, aba, busca
+  const filtrados = useMemo(() => (
+    pedidos
+      .filter((p) => aba === "pendentes" ? !p.retirado : p.retirado)
+      .filter((p) => {
+        const texto = busca.toLowerCase();
+        return (
+          p.nome?.toLowerCase().includes(texto) ||
+          p.telefone?.toLowerCase().includes(texto)
+        );
+      })
+  ), [pedidos, aba, busca]);
 
-  const visiveis = verTodos ? filtrados : filtrados.slice(0, LIMITE_INICIAL);
+  // useMemo para evitar recalcular visiveis a cada render
+  const visiveis = useMemo(
+    () => verTodos ? filtrados : filtrados.slice(0, LIMITE_INICIAL),
+    [filtrados, verTodos]
+  );
+
   const restantes = filtrados.length - LIMITE_INICIAL;
 
   return (

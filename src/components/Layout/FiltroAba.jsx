@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import pendenteIcon from '../../assets/icons/pendente.svg';
 import retiradoIcon from '../../assets/icons/retirado.svg';
 
@@ -11,12 +12,17 @@ const ABAS = [
  * Sem linha de fundo — só a borda inferior verde na aba ativa
  */
 export function FiltroAba({ abaAtiva, onChange }) {
+  // useCallback para evitar recriação de handler a cada render
+  const handleAbaClick = useCallback((chave) => {
+    onChange(chave);
+  }, [onChange]);
+
   return (
     <div className="flex items-center justify-center gap-20 mb-20">
       {ABAS.map((aba) => (
         <button
           key={aba.key}
-          onClick={() => onChange(aba.key)}
+          onClick={() => handleAbaClick(aba.key)}
           className={`
             flex items-center gap-5 pb-4 transition-all duration-300
             ${abaAtiva === aba.key
