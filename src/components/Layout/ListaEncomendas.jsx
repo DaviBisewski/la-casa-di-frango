@@ -103,8 +103,8 @@ export function ListaEncomendas({ pedidos, onRetirar }) {
         {!verTodos && restantes > 0 && (
           <button
             onClick={() => setVerTodos(true)}
-            className="w-full mt-10 py-9 rounded-full border-2 border-[#0F4C3A]/20
-                       text-[#0F4C3A] text-3xl font-semibold
+            className="w-full mt-10 py-9 rounded-full border-2 border-[#0F4C3A]
+                       text-[#0F4C3A] text-3xl font-bold
                        hover:border-[#0F4C3A]/60 hover:bg-[#0F4C3A]/5
                        transition-all duration-200"
           >

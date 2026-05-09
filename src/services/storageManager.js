@@ -51,19 +51,32 @@ export async function migrarDadosLegados() {
 }
 
 /**
+ * Sanitiza objeto para ser seguro com fake-indexeddb
+ * Remove propriedades que não conseguem ser clonadas
+ * @param {Object} obj
+ * @returns {Object}
+ */
+function sanitizarExpediente(obj) {
+  if (!obj) return null;
+  return JSON.parse(JSON.stringify(obj));
+}
+
+/**
  * Salva expediente em todas as camadas
  * localStorage → IndexedDB → marca para sync
  * @param {Object} expediente
  */
 export async function salvarExpediente(expediente) {
+  const sanitizado = sanitizarExpediente(expediente);
+  
   // 1. localStorage — instantâneo
-  localStorage.setItem(CHAVE_ATUAL, JSON.stringify(expediente));
+  localStorage.setItem(CHAVE_ATUAL, JSON.stringify(sanitizado));
 
   // 2. IndexedDB — persistente
-  await salvarExpedienteIDB(expediente);
+  await salvarExpedienteIDB(sanitizado);
 
   // 3. marca para sync online quando disponível
-  marcarPendente(expediente.id);
+  marcarPendente(sanitizado.id);
 }
 
 /**

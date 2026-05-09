@@ -1,4 +1,6 @@
 import "@testing-library/jest-dom";
+import "fake-indexeddb/auto";
+import { vi } from "vitest";
 
 // Mock do localStorage para todos os testes
 const localStorageMock = (() => {
@@ -22,7 +24,23 @@ Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
 
-// Limpar localStorage antes de cada teste
+// Mock do navigator.onLine para testes de conectividade
+Object.defineProperty(navigator, "onLine", {
+  writable: true,
+  value: true,
+});
+
+// Limpar localStorage e IndexedDB antes de cada teste
 beforeEach(() => {
   localStorage.clear();
+  
+  // Limpar IndexedDB
+  const dbs = indexedDB.databases ? indexedDB.databases() : [];
+  if (dbs && typeof dbs.then === "function") {
+    dbs.then((databases) => {
+      databases.forEach((db) => {
+        indexedDB.deleteDatabase(db.name);
+      });
+    });
+  }
 });

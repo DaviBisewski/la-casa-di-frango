@@ -17,7 +17,13 @@ vi.mock("../../services/storage", () => ({
 
 describe("expedienteService", () => {
   beforeEach(() => {
+    localStorage.clear();
     vi.clearAllMocks();
+    // Setup mocks padrão
+    vi.mocked(storage.getDB).mockReturnValue({ days: [] });
+    vi.mocked(storage.salvarExpedienteAtual).mockImplementation(() => {});
+    vi.mocked(storage.adicionarExpedienteToDB).mockImplementation(() => {});
+    vi.mocked(storage.atualizarExpedienteNoDB).mockImplementation(() => {});
   });
 
   describe("criar()", () => {

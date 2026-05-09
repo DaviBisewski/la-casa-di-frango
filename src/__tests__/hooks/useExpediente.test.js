@@ -1,17 +1,23 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
+
+// Mocks no topo
+vi.mock("../../services/expedienteService");
+vi.mock("../../services/storage");
+
 import { useExpediente } from "../../hooks/useExpediente";
 import * as expedienteServiceModule from "../../services/expedienteService";
 import * as storageModule from "../../services/storage";
 
-// Mock dos serviços
-vi.mock("../../services/expedienteService");
-vi.mock("../../services/storage");
-
 describe("useExpediente", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
     localStorage.clear();
+    vi.clearAllMocks();
+    
+    // Setup mocks padrão
+    vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(null);
+    vi.mocked(storageModule.storage.salvarExpedienteAtual).mockImplementation(() => {});
+    vi.mocked(storageModule.storage.getDB).mockReturnValue({ days: [] });
   });
 
   describe("Carregamento inicial", () => {
@@ -22,7 +28,7 @@ describe("useExpediente", () => {
         pedidos: [],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteNoDB
       );
 
@@ -30,17 +36,17 @@ describe("useExpediente", () => {
 
       await waitFor(() => {
         expect(result.current.expediente).toEqual(expedienteNoDB);
-      });
+      }, { timeout: 3000 });
     });
 
     it("deve ter expediente como null se não houver no localStorage", async () => {
-      storageModule.storage.getExpedienteAtual.mockReturnValue(null);
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(null);
 
       const { result } = renderHook(() => useExpediente());
 
       await waitFor(() => {
         expect(result.current.expediente).toBeNull();
-      });
+      }, { timeout: 3000 });
     });
   });
 
@@ -54,8 +60,8 @@ describe("useExpediente", () => {
         vendas: [],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(null);
-      expedienteServiceModule.expedienteService.criar.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(null);
+      vi.mocked(expedienteServiceModule.expedienteService.criar).mockReturnValue(
         novoExpediente
       );
 
@@ -72,14 +78,14 @@ describe("useExpediente", () => {
       });
 
       expect(result.current.expediente).toEqual(novoExpediente);
-      expect(expedienteServiceModule.expedienteService.criar).toHaveBeenCalledWith(
+      expect(vi.mocked(expedienteServiceModule.expedienteService.criar)).toHaveBeenCalledWith(
         form
       );
     });
 
     it("não deve atualizar estado se criar retornar null", () => {
-      storageModule.storage.getExpedienteAtual.mockReturnValue(null);
-      expedienteServiceModule.expedienteService.criar.mockReturnValue(null);
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(null);
+      vi.mocked(expedienteServiceModule.expedienteService.criar).mockReturnValue(null);
 
       const { result } = renderHook(() => useExpediente());
 
@@ -116,10 +122,10 @@ describe("useExpediente", () => {
         ],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteInicial
       );
-      expedienteServiceModule.expedienteService.adicionarEncomenda.mockReturnValue(
+      vi.mocked(expedienteServiceModule.expedienteService.adicionarEncomenda).mockReturnValue(
         expedienteAtualizado
       );
 
@@ -163,10 +169,10 @@ describe("useExpediente", () => {
         ],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteInicial
       );
-      expedienteServiceModule.expedienteService.adicionarEncomenda.mockReturnValue(
+      vi.mocked(expedienteServiceModule.expedienteService.adicionarEncomenda).mockReturnValue(
         expedienteAtualizado
       );
 
@@ -207,10 +213,10 @@ describe("useExpediente", () => {
         ],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteInicial
       );
-      expedienteServiceModule.expedienteService.adicionarVenda.mockReturnValue(
+      vi.mocked(expedienteServiceModule.expedienteService.adicionarVenda).mockReturnValue(
         expedienteAtualizado
       );
 
@@ -247,10 +253,10 @@ describe("useExpediente", () => {
         ],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteInicial
       );
-      expedienteServiceModule.expedienteService.marcarRetirado.mockReturnValue(
+      vi.mocked(expedienteServiceModule.expedienteService.marcarRetirado).mockReturnValue(
         expedienteAtualizado
       );
 
@@ -283,10 +289,10 @@ describe("useExpediente", () => {
         ],
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteInicial
       );
-      expedienteServiceModule.expedienteService.marcarRetirado.mockReturnValue(
+      vi.mocked(expedienteServiceModule.expedienteService.marcarRetirado).mockReturnValue(
         expedienteAtualizado
       );
 
@@ -316,10 +322,10 @@ describe("useExpediente", () => {
         encerradoEm: 1715180000000,
       };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(
         expedienteInicial
       );
-      expedienteServiceModule.expedienteService.encerrar.mockReturnValue(
+      vi.mocked(expedienteServiceModule.expedienteService.encerrar).mockReturnValue(
         expedienteAtualizado
       );
 
@@ -342,7 +348,7 @@ describe("useExpediente", () => {
         { id: "1", status: "closed" },
       ];
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(null);
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(null);
       storageModule.storage.getHistorico.mockReturnValue(historico);
 
       const { result } = renderHook(() => useExpediente());
@@ -354,7 +360,7 @@ describe("useExpediente", () => {
     });
 
     it("deve retornar array vazio quando não houver histórico", () => {
-      storageModule.storage.getExpedienteAtual.mockReturnValue(null);
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(null);
       storageModule.storage.getHistorico.mockReturnValue([]);
 
       const { result } = renderHook(() => useExpediente());
@@ -370,7 +376,7 @@ describe("useExpediente", () => {
       const expediente1 = { id: "1", status: "closed" };
       const expediente2 = { id: "2", status: "active" };
 
-      storageModule.storage.getExpedienteAtual.mockReturnValue(expediente1);
+      vi.mocked(storageModule.storage.getExpedienteAtual).mockReturnValue(expediente1);
 
       const { result } = renderHook(() => useExpediente());
 

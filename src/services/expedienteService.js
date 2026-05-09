@@ -12,42 +12,37 @@ export const expedienteService = {
     return db.days.some((d) => d.status === "active");
   },
 
-  /**
-   * Cria um novo expediente com o estoque inicial do dia
-   * Usa timestamp completo no ID para garantir unicidade
-   * @param {Object} form - Valores do formulário com quantidades iniciais
-   * @returns {Object|null} Novo expediente ou null se já houver ativo
-   */
-  criar(form) {
-    // 🔥 bloqueia se já houver expediente ativo
-    if (this.temExpedienteAtivo()) return null;
+/**
+ * Cria um novo expediente com o estoque inicial do dia
+ * Usa timestamp no ID para garantir unicidade
+ * @param {Object} form - Valores do formulário
+ * @returns {Object} Novo expediente criado
+ */
+criar(form) {
+  const hoje = new Date().toISOString().split("T")[0];
+  const isSunday = new Date().getDay() === 0;
+  const timestamp = Date.now();
 
-    const hoje = new Date().toISOString().split("T")[0];
-    const isSunday = new Date().getDay() === 0;
-    const timestamp = Date.now();
+  const novoExpediente = {
+    id: `${hoje}-${timestamp}`,
+    date: hoje,
+    status: "active",
+    isSunday,
+    iniciadoEm: timestamp,
+    estoque: {
+      frangosComRecheio: Number(form.comRecheio),
+      frangosSemRecheio: Number(form.semRecheio),
+      meioFrango:        Number(form.meio),
+      maionese10: isSunday ? Number(form.maionese10) : 0,
+      maionese15: isSunday ? Number(form.maionese15) : 0,
+      costela:    isSunday ? Number(form.costela)    : 0,
+    },
+    pedidos: [],
+    vendas:  [],
+  };
 
-    const novoExpediente = {
-      id: `${hoje}-${timestamp}`, // ID único com timestamp
-      date: hoje,
-      status: "active",
-      isSunday,
-      iniciadoEm: timestamp,
-      estoque: {
-        frangosComRecheio: Number(form.comRecheio),
-        frangosSemRecheio: Number(form.semRecheio),
-        meioFrango:        Number(form.meio),
-        maionese10: isSunday ? Number(form.maionese10) : 0,
-        maionese15: isSunday ? Number(form.maionese15) : 0,
-        costela:    isSunday ? Number(form.costela)    : 0,
-      },
-      pedidos: [],
-      vendas:  [],
-    };
-
-    storage.adicionarExpedienteToDB(novoExpediente);
-    storage.salvarExpedienteAtual(novoExpediente);
-    return novoExpediente;
-  },
+  return novoExpediente;
+},
 
   getTotalEncomendado(expediente, chave) {
     return (expediente.pedidos || []).reduce((total, pedido) => {
