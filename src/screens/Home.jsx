@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import StartShift from '../components/ui/ButtonExpediente';
 import { useExpediente } from '../hooks/useExpediente';
@@ -12,21 +12,28 @@ export default function Home() {
   const { mostrar } = useToast();
   const navigate = useNavigate();
 
+  /** Histórico carregado de forma assíncrona do IndexedDB */
+  const [historico, setHistorico] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+
   /** Data selecionada no calendário no formato YYYY-MM-DD ou null */
   const [dataFiltro, setDataFiltro] = useState(null);
 
-  const historico = getHistorico();
+  /** Carrega histórico ao montar e sempre que voltar para a tela */
+  useEffect(() => {
+    async function carregar() {
+      setCarregando(true);
+      const dados = await getHistorico();
+      setHistorico(dados || []);
+      setCarregando(false);
+    }
+    carregar();
+  }, []);
 
-  /**
-   * Lista de datas que possuem expediente — usada para destacar no calendário
-   * Usa expediente.date que já está no formato YYYY-MM-DD
-   */
+  /** Datas com expediente para destacar no calendário */
   const datasComExpediente = historico.map((exp) => exp.date);
 
-  /**
-   * Filtra o histórico pela data selecionada
-   * Se nenhuma data selecionada, mostra todos
-   */
+  /** Filtra por data selecionada ou mostra todos */
   const historicoFiltrado = dataFiltro
     ? historico.filter((exp) => exp.date === dataFiltro)
     : historico;
@@ -53,10 +60,9 @@ export default function Home() {
       <StartShift onStart={() => navigate("/estoque")} />
 
       {/* Histórico de vendas */}
-      {historico.length > 0 && (
+      {!carregando && historico.length > 0 && (
         <section className="px-12 mt-20 pb-20">
 
-          {/* Cabeçalho com título e filtro de calendário */}
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-[#0F4C3A] text-4xl font-extrabold uppercase tracking-tight">
               Histórico de Vendas
@@ -88,6 +94,14 @@ export default function Home() {
           )}
 
         </section>
+      )}
+
+      {/* Loading */}
+      {carregando && (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-12 h-12 rounded-full border-4 border-[#0F4C3A]/20
+                          border-t-[#0F4C3A] animate-spin" />
+        </div>
       )}
 
     </div>

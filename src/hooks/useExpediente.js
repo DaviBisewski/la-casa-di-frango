@@ -1,41 +1,56 @@
 import { useEffect, useState } from "react";
-import { storage } from "../services/storage";
+import {
+  getExpedienteAtual,
+  adicionarExpediente,
+  atualizarExpediente,
+  temExpedienteAtivo,
+  migrarDadosLegados,
+  getHistorico as getHistoricoManager,
+} from "../services/storageManager";
 import { expedienteService } from "../services/expedienteService";
 
 export function useExpediente() {
   const [expediente, setExpediente] = useState(null);
 
   useEffect(() => {
-    const salvo = storage.getExpedienteAtual();
+    // migra dados legados na primeira execução
+    migrarDadosLegados();
+
+    // carrega expediente atual do localStorage
+    const salvo = getExpedienteAtual();
     if (salvo) setExpediente(salvo);
   }, []);
 
-  function iniciarExpedienteComEstoque(form) {
+  async function iniciarExpedienteComEstoque(form) {
+    const ativo = await temExpedienteAtivo();
+    if (ativo) return null;
     const novo = expedienteService.criar(form);
+    await adicionarExpediente(novo);
     setExpediente(novo);
+    return novo;
   }
 
-  function adicionarEncomenda(dados) {
+  async function adicionarEncomenda(dados) {
     const atualizado = expedienteService.adicionarEncomenda(expediente, dados);
+    await atualizarExpediente(atualizado);
     setExpediente(atualizado);
   }
 
-  function adicionarVenda(dados) {
+  async function adicionarVenda(dados) {
     const atualizado = expedienteService.adicionarVenda(expediente, dados);
+    await atualizarExpediente(atualizado);
     setExpediente(atualizado);
   }
 
-  function marcarRetirado(pedidoId) {
+  async function marcarRetirado(pedidoId) {
     const atualizado = expedienteService.marcarRetirado(expediente, pedidoId);
+    await atualizarExpediente(atualizado);
     setExpediente(atualizado);
   }
 
-  /**
-   * Encerra o expediente ativo
-   * Atualiza status para 'closed' no estado e no storage
-   */
-  function encerrarExpediente() {
+  async function encerrarExpediente() {
     const atualizado = expedienteService.encerrar(expediente);
+    await atualizarExpediente(atualizado);
     setExpediente(atualizado);
   }
 
@@ -43,8 +58,8 @@ export function useExpediente() {
     setExpediente(exp);
   }
 
-  function getHistorico() {
-    return storage.getHistorico();
+  async function getHistorico() {
+    return getHistoricoManager();
   }
 
   return {
