@@ -154,38 +154,6 @@ export default function Encomenda() {
 
       <ButtonConfirm onClick={handleSubmit}>
         Adicionar Encomenda
-        <div className="mb-16">
-          <ProdutoLinha
-            icone={maioneseIcon}
-            titulo="Maionese R$10,00"
-            quantidade={qtds.maionese10}
-            onChange={(v) => setQtd("maionese10", v)}
-            max={disponivel("maionese10")}
-          />
-          <ProdutoLinha
-            icone={maioneseIcon}
-            titulo="Maionese R$15,00"
-            quantidade={qtds.maionese15}
-            onChange={(v) => setQtd("maionese15", v)}
-            max={disponivel("maionese15")}
-          />
-        </div>
-      )}
-
-      {isSunday && filtroAtivo === "costela" && (
-        <div className="mb-16">
-          <ProdutoLinha
-            icone={costelaIcon}
-            titulo="Costela"
-            quantidade={qtds.costela}
-            onChange={(v) => setQtd("costela", v)}
-            max={disponivel("costela")}
-          />
-        </div>
-      )}
-
-      <ButtonConfirm onClick={handleSubmit}>
-        Adicionar Encomenda
       </ButtonConfirm>
 
     </div>
