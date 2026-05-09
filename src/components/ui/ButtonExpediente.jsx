@@ -20,17 +20,17 @@ const StartShift = ({ onStart }) => {
                    shadow-lg group mt-8 md:mt-20"
       >
         <div className="flex items-center justify-center
-                        w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24
+                        w-16 h-16 sm:w-16 sm:h-16 md:w-24 md:h-24
                         bg-black/20 rounded-full">
           <img 
             src={plusIcon} 
             alt="Ícone de mais" 
-            className="w-7 h-7 sm:w-9 sm:h-9 md:w-12 md:h-12 brightness-0 invert" 
+            className="w-7 h-7 sm:w-7 sm:h-7 md:w-12 md:h-12 brightness-0 invert" 
           />
         </div>
 
         <span className="text-white
-                         text-2xl sm:text-1xl md:text-5xl
+                         text-2xl sm:text-xl md:text-5xl
                          font-medium tracking-tight text-center">
           Começar expediente
         </span>

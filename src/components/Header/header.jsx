@@ -27,7 +27,7 @@ const Header = () => {
             />
           </div>
 
-          <h1 className="text-white text-2xl sm:text-5xl font-extrabold truncate">
+          <h1 className="text-white text-2xl sm:text-4xl font-extrabold truncate">
             La Casa Di Frango
           </h1>
         </button>
