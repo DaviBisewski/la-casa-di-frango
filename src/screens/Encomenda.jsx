@@ -27,8 +27,8 @@ const PRODUTOS = {
     { chave: "meioFrango", titulo: "Meio Frango", icone: frangoIcon },
   ],
   maioneses: [
-    { chave: "maionese10", titulo: "Maionese R$10,00", icone: maioneseIcon },
-    { chave: "maionese15", titulo: "Maionese R$15,00", icone: maioneseIcon },
+    { chave: "maionese10", titulo: "Maionese P", icone: maioneseIcon },
+    { chave: "maionese15", titulo: "Maionese G", icone: maioneseIcon },
   ],
   costela: [
     { chave: "costela", titulo: "Costela", icone: costelaIcon },

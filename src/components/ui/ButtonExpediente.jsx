@@ -5,8 +5,8 @@ const StartShift = ({ onStart }) => {
     <section className="px-4 sm:px-6 md:px-12 mt-10 md:mt-20 w-full max-w-[1400px] mx-auto">
 
       <h2 className="text-[#0F4C3A]
-                     text-2xl sm:text-3xl md:text-4xl
-                     font-bold mb-6 md:mb-10 tracking-tight uppercase">
+                       text-2xl sm:text-3xl lg:text-4xl
+                       font-extrabold uppercase tracking-tight">
         INICIAR NOVO EXPEDIENTE?
       </h2>
 
