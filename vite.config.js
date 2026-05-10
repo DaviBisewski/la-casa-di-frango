@@ -17,8 +17,8 @@ export default defineConfig({
         name: 'La Casa Di Frango',
         short_name: 'Frango',
         description: 'Sistema de estoque e vendas',
-        theme_color: '#b91c1c',
-        background_color: '#ffffff',
+        theme_color: '#0F4C3A',
+        background_color: '#0F4C3A',
         display: 'standalone',
         start_url: '/',
 

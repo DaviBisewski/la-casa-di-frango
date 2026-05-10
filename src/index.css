@@ -1,5 +1,4 @@
 /* 1. Primeiro os imports, sem nada entre eles */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 /* 2. Agora o restante do seu código */
@@ -12,7 +11,7 @@
     @apply font-sans;
   }
 
-  /* Garante que todos elementos de interação usem Poppins */
+  /* Garante que todos elementos de interação usem Montserrat */
   button, input, textarea, select {
     @apply font-sans;
   }
