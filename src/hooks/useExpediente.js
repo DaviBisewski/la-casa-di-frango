@@ -143,6 +143,9 @@ export function useExpediente() {
    * Encerra o expediente (fecha o dia de vendas)
    * Após isso, não é possível adicionar mais encomendas/vendas
    * 
+   * ⭐ CORRIGIDO: Agora reseta expediente para null após encerrar
+   * Isso evita que o dashboard mostre o expediente encerrado ao criar um novo
+   * 
    * @async
    * @returns {Promise<void>}
    * 
@@ -152,7 +155,9 @@ export function useExpediente() {
   async function encerrarExpediente() {
     const atualizado = expedienteService.encerrar(expediente);
     await atualizarExpediente(atualizado);
-    setExpediente(atualizado);
+    // ⭐ CORREÇÃO: Reseta o expediente para null
+    // Assim o Dashboard redireciona para Home quando tenta carregar
+    setExpediente(null);
   }
 
   /**
