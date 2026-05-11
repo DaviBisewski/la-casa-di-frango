@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import StartShift from '../components/ui/ButtonExpediente';
-import { useExpediente } from '../hooks/useExpediente';
+import StartShift from '../components/Ui/ButtonExpediente';
+import { useExpediente } from '../contexts/ExpedienteContext';
 import { useToast } from '../contexts/ToastContext';
 import { MENSAGENS } from '../services/toastService';
 import HistoricoCard from '../components/Cards/HistoricoCard';

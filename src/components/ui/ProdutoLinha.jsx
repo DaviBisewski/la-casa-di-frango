@@ -1,5 +1,15 @@
 import { QuantidadeCounter } from '../Layout/QuantidadeCounter';
 
+/**
+ * Linha de produto com contador de quantidade
+ * Usada em Encomenda.jsx e Venda.jsx para input de itens
+ * 
+ * @param {string} icone - URL/src da imagem do produto
+ * @param {string} titulo - Nome do produto (ex: "Frango C/R")
+ * @param {number} quantidade - Quantidade atual selecionada
+ * @param {Function} onChange - Callback quando quantidade muda
+ * @param {number} max - Quantidade máxima disponível
+ */
 export function ProdutoLinha({ icone, titulo, quantidade, onChange, max }) {
   return (
     <div className="flex items-center justify-between py-5 sm:py-7 md:py-10

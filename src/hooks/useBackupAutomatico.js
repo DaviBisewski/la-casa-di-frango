@@ -12,15 +12,25 @@ import { useToast } from "./useToast";
 const INTERVALO_BACKUP_MS = 5 * 60 * 1000; // 5 minutos
 
 export function useBackupAutomatico() {
+  const { mostrar } = useToast();
 
   useEffect(() => {
     // backup imediato ao montar
-    fazerBackupEmergencia();
+    try {
+      fazerBackupEmergencia();
+    } catch (err) {
+      console.error("❌ Erro no backup automático inicial:", err);
+      mostrar("Erro ao fazer backup local", "erro");
+    }
 
     // backup a cada 5 minutos
     const intervalo = setInterval(() => {
-      fazerBackupEmergencia();
-      console.log("💾 Backup automático realizado —", new Date().toLocaleTimeString());
+      try {
+        fazerBackupEmergencia();
+        console.log("💾 Backup automático realizado —", new Date().toLocaleTimeString());
+      } catch (err) {
+        console.error("❌ Erro no backup automático:", err);
+      }
     }, INTERVALO_BACKUP_MS);
 
     // listener de sync ao voltar online
@@ -28,8 +38,11 @@ export function useBackupAutomatico() {
       if (resultado.sincronizados > 0) {
         console.log(`🌐 ${resultado.sincronizados} expediente(s) sincronizados`);
       }
+      if (resultado.erros > 0) {
+        mostrar(`${resultado.erros} erro(s) ao sincronizar com nuvem`, "aviso");
+      }
     });
 
     return () => clearInterval(intervalo);
-  }, []);
+  }, [mostrar]);
 }

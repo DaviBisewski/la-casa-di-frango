@@ -1,6 +1,20 @@
 import telefoneIcon from '../../assets/icons/telefone.svg';
 import corretoIcon from '../../assets/icons/correto.svg';
 
+/**
+ * Card de exibição de encomenda na lista
+ * Mostra nome, telefone, itens e botão de retirada
+ * 
+ * @param {Object} pedido - Dados do pedido
+ * @param {string} pedido.id - ID único do pedido
+ * @param {string} pedido.nome - Nome do cliente
+ * @param {string} pedido.telefone - Telefone de contato
+ * @param {Array} pedido.itens - Itens [{ chave, quantidade }, ...]
+ * @param {boolean} pedido.retirado - Se já foi marcado como retirado
+ * @param {Function} onRetirar - Callback ao clicar no botão de retirada
+ * @param {boolean} retirado - Se está em modo "apenas leitura" (retirado)
+ */
+
 const LABEL = {
   frangosComRecheio: "C/R",
   frangosSemRecheio: "S/R",

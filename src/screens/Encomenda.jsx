@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useExpediente } from "../hooks/useExpediente";
+import { useExpediente } from "../contexts/ExpedienteContext";
 import { useToast } from "../contexts/ToastContext";
 import { MENSAGENS } from "../services/toastService";
 import { ProdutoLinha } from "../components/ui/ProdutoLinha";
@@ -8,32 +8,8 @@ import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
 import { ButtonConfirm } from "../components/ui/ButtonConfirm";
 import { expedienteService } from "../services/expedienteService";
 
-import frangoIcon from "../assets/icons/frango.svg";
-import maioneseIcon from "../assets/icons/maionese.svg";
-import costelaIcon from "../assets/icons/costela.svg";
+import { PRODUTOS, FILTROS_CATEGORIA } from "../constants/produtos";
 import encomendaIcon from "../assets/icons/frango.svg";
-
-const FILTROS = [
-  { key: "frangos",   label: "Frangos",   icone: frangoIcon   },
-  { key: "maioneses", label: "Maioneses", icone: maioneseIcon },
-  { key: "costela",   label: "Costela",   icone: costelaIcon  },
-];
-
-// Definição centralizada de produtos (mesmo em Venda.jsx)
-const PRODUTOS = {
-  frangos: [
-    { chave: "frangosSemRecheio", titulo: "Frango S/R", icone: frangoIcon },
-    { chave: "frangosComRecheio", titulo: "Frango C/R", icone: frangoIcon },
-    { chave: "meioFrango", titulo: "Meio Frango", icone: frangoIcon },
-  ],
-  maioneses: [
-    { chave: "maionese10", titulo: "Maionese P", icone: maioneseIcon },
-    { chave: "maionese15", titulo: "Maionese G", icone: maioneseIcon },
-  ],
-  costela: [
-    { chave: "costela", titulo: "Costela", icone: costelaIcon },
-  ],
-};
 
 function CampoTexto({
   label,
@@ -176,7 +152,7 @@ return (
     {isSunday && (
       <div className="mb-6 sm:mb-8">
         <EstoqueFiltros
-          filtros={FILTROS}
+          filtros={FILTROS_CATEGORIA}
           filtroAtivo={filtroAtivo}
           onChange={setFiltroAtivo}
         />

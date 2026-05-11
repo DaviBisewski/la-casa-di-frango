@@ -2,6 +2,14 @@ import { useNavigate } from "react-router-dom";
 import plusIcon from "../../assets/icons/plus.svg";
 import vendaIcon from "../../assets/icons/venda.svg";
 
+/**
+ * Botões de ação rápida: Encomenda e Venda
+ * Aparece no Dashboard para facilitar novas transações
+ * 
+ * Navegação:
+ * - Clique em "Encomenda" → vai para /encomenda
+ * - Clique em "Venda" → vai para /venda
+ */
 export function BotoesAcao() {
   const navigate = useNavigate();
 

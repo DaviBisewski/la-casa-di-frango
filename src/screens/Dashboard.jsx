@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useExpediente } from "../hooks/useExpediente";
+import { useExpediente } from "../contexts/ExpedienteContext";
 import { EstoqueCarrossel } from "../components/Layout/EstoqueCarrosel";
 import { EstoqueCard } from "../components/Cards/EstoqueCard";
 import { EstoqueFiltros } from "../components/Layout/EstoqueFiltro";
@@ -8,18 +8,14 @@ import { BotoesAcao } from "../components/ui/ButtonsAction";
 import { ListaEncomendas } from "../components/Layout/ListaEncomendas";
 import { BotaoEncerrar } from "../components/ui/BotaoEncerrar";
 
+import { FILTROS_CATEGORIA } from "../constants/produtos";
+
 import estoqueIcon from "../assets/icons/estoque.svg";
 import ativoIcon from "../assets/icons/statusActive.svg";
 import encerradoIcon from "../assets/icons/encerrado.svg";
 import frangoIcon from "../assets/icons/frango.svg";
 import maioneseIcon from "../assets/icons/maionese.svg";
 import costelaIcon from "../assets/icons/costela.svg";
-
-const FILTROS = [
-  { key: "frangos",   label: "Frangos",   icone: frangoIcon   },
-  { key: "maioneses", label: "Maioneses", icone: maioneseIcon },
-  { key: "costela",   label: "Costela",   icone: costelaIcon  },
-];
 
 export default function Dashboard() {
   const { expediente, marcarRetirado, encerrarExpediente } = useExpediente();
@@ -82,7 +78,7 @@ return (
 
     {isSunday && (
       <EstoqueFiltros
-        filtros={FILTROS}
+        filtros={FILTROS_CATEGORIA}
         filtroAtivo={filtroAtivo}
         onChange={setFiltroAtivo}
       />

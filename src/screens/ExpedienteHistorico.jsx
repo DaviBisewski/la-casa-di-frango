@@ -106,7 +106,6 @@ return (
       <ListaEncomendas
         pedidos={expediente.pedidos}
         onRetirar={() => {}}
-        somenteLeitura
       />
     )}
 

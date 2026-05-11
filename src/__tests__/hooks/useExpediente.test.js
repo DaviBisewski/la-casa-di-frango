@@ -5,7 +5,7 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 vi.mock("../../services/expedienteService");
 vi.mock("../../services/storage");
 
-import { useExpediente } from "../../hooks/useExpediente";
+import { useExpediente } from "../../contexts/ExpedienteContext";
 import * as expedienteServiceModule from "../../services/expedienteService";
 import * as storageModule from "../../services/storage";
 

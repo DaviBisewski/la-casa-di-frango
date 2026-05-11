@@ -8,6 +8,9 @@ const LIMITE_INICIAL = 4;
 /**
  * Lista de encomendas com animação de fade+slide ao trocar de aba ou filtrar
  * Inclui busca, paginação e transição suave entre conteúdos
+ * 
+ * @param {Array} pedidos - Lista de pedidos/encomendas a exibir
+ * @param {Function} onRetirar - Callback ao marcar pedido como retirado
  */
 export function ListaEncomendas({ pedidos, onRetirar }) {
   const [busca, setBusca] = useState("");
